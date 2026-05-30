@@ -19,6 +19,7 @@ import { ShowCloudBackupHistoryPage } from '../ShowCloudBackupHistoryPage';
 import { HuaweiAccountManager } from '../../utils/HuaweiAccountManager';
 import { hdsMaterial, HdsNavigation, HdsNavigationTitleMode, ScrollEffectType } from '@kit.UIDesignKit';
 import { CommonConstants } from '../../utils/CommonConstants';
+import { TokenImporterRegistry, TokenImporter } from '../../utils/importers/TokenImporter';
 
 @Preview
 @ComponentV2
@@ -31,6 +32,7 @@ export struct BackupAndMigrationSheet {
   @Local versionCode?: number;
   @Local cloudBackupEnabled: boolean = false;
   @Local isHuaweiLoggedIn: boolean = false;
+  @Local importers: TokenImporter[] = [];
   private sheetScroller: Scroller = new Scroller();
 
   //备份时是否为导出模式
@@ -43,6 +45,10 @@ export struct BackupAndMigrationSheet {
     this.versionCode = bundleInfo?.versionCode;
     this.cloudBackupEnabled = AppPreference.getPreference(PREF_KEYS.APPEARANCE_HUAWEI_CLOUD_SYNC_ENABLE) as boolean;
     this.isHuaweiLoggedIn = HuaweiAccountManager.getInstance().userLogin;
+    // 初始化导入器注册表
+    const registry = TokenImporterRegistry.getInstance();
+    registry.init();
+    this.importers = registry.getAll();
   }
 
   //region 加密导入导出
@@ -267,6 +273,27 @@ export struct BackupAndMigrationSheet {
               }
             }
             .padding({ left: 10, right: 10 })
+
+            // 从其他验证器导入
+            if (this.importers.length > 0) {
+              ListItem() {
+                SettingItem({ title: $r('app.string.setting_import_from_other_apps') }) {
+                  ForEach(this.importers, (importer: TokenImporter) => {
+                    SubItemButton({
+                      symbol: importer.icon,
+                      text: importer.name,
+                      description: importer.description
+                    })
+                      .onClick(() => {
+                        importer.import(this.getUIContext(), (tokens: Array<TokenConfig>) => {
+                          this.backupReload(tokens);
+                        });
+                      })
+                  })
+                }
+              }
+              .padding({ left: 10, right: 10 })
+            }
 
             ListItem() {
               SettingItem({ title: "" }) {
