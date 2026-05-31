@@ -1226,7 +1226,7 @@
     },
     {
       "name": "importer_twofa_desc",
-      "value": "导入 .json 备份文件"
+      "value": "导入 .json 备份文件（不含密码）"
     },
     {
       "name": "importer_twofa_invalid_file",

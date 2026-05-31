@@ -1226,7 +1226,7 @@
     },
     {
       "name": "importer_twofa_desc",
-      "value": "Import .json backup file"
+      "value": "Import .json backup file (non-encrypted)"
     },
     {
       "name": "importer_twofa_invalid_file",
