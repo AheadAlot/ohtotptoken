@@ -32,6 +32,8 @@ export struct SubItemIconManager {
   @Local window: AppWindowInfo = AppStorageV2.connect(AppWindowInfo) as AppWindowInfo;
   @Local packItems: PackItem[] = [];
   @Local draftEnabledPacks: string[] = [];
+  @Local editDisplayItems: PackItem[] = [];
+  @Local dragFromIndex: number = -1;
 
   private icon_pack_dir = this.window.Context?.filesDir + "/icon_packs";
 
@@ -61,18 +63,32 @@ export struct SubItemIconManager {
     this.packItems = this.buildPackItems();
   }
 
+  private buildEditDisplayItems(): PackItem[] {
+    const items: PackItem[] = [];
+    for (const packId of this.draftEnabledPacks) {
+      const found = this.packItems.find(p => p.id === packId);
+      if (found) items.push(found);
+    }
+    for (const item of this.packItems) {
+      if (!this.draftEnabledPacks.includes(item.id)) items.push(item);
+    }
+    return items;
+  }
+
   aboutToAppear(): void {
     this.syncFromTokenIconPacks();
   }
 
   private enterEditMode(): void {
     this.draftEnabledPacks = [...TokenIconPacks.enabled_packs];
+    this.editDisplayItems = this.buildEditDisplayItems();
     this.isEditing = true;
   }
 
   private exitEditMode(): void {
     this.isEditing = false;
     this.draftEnabledPacks = [];
+    this.editDisplayItems = [];
   }
 
   private isDraftEnabled(packId: string): boolean {
@@ -86,6 +102,7 @@ export struct SubItemIconManager {
     } else {
       this.draftEnabledPacks = [...this.draftEnabledPacks, packId];
     }
+    this.editDisplayItems = this.buildEditDisplayItems();
   }
 
   private async onSave(): Promise<void> {
@@ -238,9 +255,16 @@ export struct SubItemIconManager {
           }
 
           List({ space: 5 }) {
-            ForEach(this.packItems, (item: PackItem, index: number) => {
+            ForEach(this.isEditing ? this.editDisplayItems : this.packItems, (item: PackItem, index: number) => {
               ListItem() {
                 Row() {
+                  if (this.isEditing && this.isDraftEnabled(item.id)) {
+                    SymbolGlyph($r('sys.symbol.line_3_horizontal'))
+                      .fontSize(18)
+                      .fontColor([$r('sys.color.ohos_id_color_text_secondary')])
+                      .margin({ right: 4 })
+                  }
+
                   if (this.isEditing) {
                     Checkbox()
                       .select(this.isDraftEnabled(item.id))
@@ -277,70 +301,39 @@ export struct SubItemIconManager {
                   .alignItems(HorizontalAlign.Start)
                   .layoutWeight(1)
 
-                  if (this.isEditing) {
-                    Column({ space: 2 }) {
-                      SymbolGlyph($r('sys.symbol.chevron_up'))
-                        .fontSize(14)
-                        .fontColor([$r('sys.color.ohos_id_color_text_secondary')])
-                        .onClick(() => {
-                          const idx = this.draftEnabledPacks.indexOf(item.id);
-                          if (idx > 0) {
-                            const arr = [...this.draftEnabledPacks];
-                            const tmp = arr[idx];
-                            arr[idx] = arr[idx - 1];
-                            arr[idx - 1] = tmp;
-                            this.draftEnabledPacks = arr;
-                          }
-                        })
-                      SymbolGlyph($r('sys.symbol.chevron_down'))
-                        .fontSize(14)
-                        .fontColor([$r('sys.color.ohos_id_color_text_secondary')])
-                        .onClick(() => {
-                          const idx = this.draftEnabledPacks.indexOf(item.id);
-                          if (idx >= 0 && idx < this.draftEnabledPacks.length - 1) {
-                            const arr = [...this.draftEnabledPacks];
-                            const tmp = arr[idx];
-                            arr[idx] = arr[idx + 1];
-                            arr[idx + 1] = tmp;
-                            this.draftEnabledPacks = arr;
-                          }
-                        })
+                  if (!this.isEditing && item.aegisPack) {
+                    Row() {
+                      SymbolGlyph($r('sys.symbol.trash'))
+                        .fontSize(20)
+                        .fontWeight(FontWeight.Medium)
+                        .fontColor([$r('app.color.str_main')])
                     }
-                  } else {
-                    if (item.aegisPack) {
-                      Row() {
-                        SymbolGlyph($r('sys.symbol.trash'))
-                          .fontSize(20)
-                          .fontWeight(FontWeight.Medium)
-                          .fontColor([$r('app.color.str_main')])
-                      }
-                      .width('10%')
-                      .onClick(() => {
-                        this.getUIContext().showAlertDialog({
-                          message: $r('app.string.alert_icon_pack_remove_confirm_msg', item.name),
-                          autoCancel: true,
-                          alignment: DialogAlignment.Center,
-                          primaryButton: {
-                            defaultFocus: false,
-                            value: $r('app.string.dialog_btn_cancel'),
-                            action: () => {
-                              return;
-                            }
-                          },
-                          secondaryButton: {
-                            value: $r('app.string.dialog_btn_confirm'),
-                            fontColor: Color.Red,
-                            action: async () => {
-                              TokenIconPacks.removeAegisIconPack(item.aegisPack!).then(async () => {
-                                this.syncFromTokenIconPacks();
-                                await this.rematchAndShowProgress();
-                                TokenIconPacks.notifyChanged();
-                              });
-                            }
+                    .width('10%')
+                    .onClick(() => {
+                      this.getUIContext().showAlertDialog({
+                        message: $r('app.string.alert_icon_pack_remove_confirm_msg', item.name),
+                        autoCancel: true,
+                        alignment: DialogAlignment.Center,
+                        primaryButton: {
+                          defaultFocus: false,
+                          value: $r('app.string.dialog_btn_cancel'),
+                          action: () => {
+                            return;
                           }
-                        })
+                        },
+                        secondaryButton: {
+                          value: $r('app.string.dialog_btn_confirm'),
+                          fontColor: Color.Red,
+                          action: async () => {
+                            TokenIconPacks.removeAegisIconPack(item.aegisPack!).then(async () => {
+                              this.syncFromTokenIconPacks();
+                              await this.rematchAndShowProgress();
+                              TokenIconPacks.notifyChanged();
+                            });
+                          }
+                        }
                       })
-                    }
+                    })
                   }
                 }
                 .padding(10)
@@ -349,6 +342,27 @@ export struct SubItemIconManager {
                 .width('100%')
               }
               .width('100%')
+              .draggable(this.isEditing && this.isDraftEnabled(item.id))
+              .onDragStart(() => {
+                this.dragFromIndex = index;
+              })
+              .onDrop((_event: DragEvent, _extraParams: string) => {
+                const fromIdx = this.dragFromIndex;
+                const toIdx = index;
+                this.dragFromIndex = -1;
+                if (fromIdx < 0 || fromIdx === toIdx) return;
+                const enabledCount = this.draftEnabledPacks.length;
+                if (fromIdx >= enabledCount || toIdx >= enabledCount) return;
+                const arr = [...this.editDisplayItems];
+                const moved = arr.splice(fromIdx, 1)[0];
+                const insertIdx = toIdx > fromIdx ? toIdx - 1 : toIdx;
+                arr.splice(insertIdx, 0, moved);
+                this.editDisplayItems = arr;
+                this.draftEnabledPacks = arr.slice(0, enabledCount).map(p => p.id);
+              })
+              .onDragEnd(() => {
+                this.dragFromIndex = -1;
+              })
             }, (item: PackItem) => item.id + item.name)
           }
           .width('100%')

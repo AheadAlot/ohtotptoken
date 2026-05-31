@@ -387,36 +387,38 @@ struct Index {
     cornerRadius: 10,
   })
 
-  refreshIconPack(): void {
+  async refreshIconPack(): Promise<void> {
     TokenIconPacks.addUserIconPack(this.user_icon_dir);
-    fs.listFile(this.icon_pack_dir).then((paths) => {
-      const promises = paths.map((path) =>
-        TokenIconPacks.addAegisIconPack(this.icon_pack_dir + "/" + path)
-          .catch((err: BusinessError) => {
-            hilog.error(0, 'Index', `Failed to load icon pack ${path}: ${JSON.stringify(err)}`);
-          })
-      );
-      Promise.all(promises).then(() => {
-        if (!AppPreference.hasEnabledPacksMigrated()) {
-          const selected = AppPreference.getLegacySelectedPack();
-          if (selected === 0) {
-            TokenIconPacks.enabled_packs = [BUILTIN_DEFAULT_PACK_ID];
-          } else {
-            const index = selected - 1;
-            if (index >= 0 && index < TokenIconPacks.aegis_icon_packs.length) {
-              const uuid = TokenIconPacks.aegis_icon_packs[index].uuid;
-              TokenIconPacks.enabled_packs = uuid ? [uuid] : [BUILTIN_DEFAULT_PACK_ID];
-            } else {
-              TokenIconPacks.enabled_packs = [BUILTIN_DEFAULT_PACK_ID];
-            }
-          }
-          AppPreference.saveEnabledPacks(TokenIconPacks.enabled_packs);
-        } else {
-          TokenIconPacks.enabled_packs = AppPreference.loadEnabledPacks();
+    try {
+      const paths = await fs.listFile(this.icon_pack_dir);
+      for (const path of paths) {
+        try {
+          await TokenIconPacks.addAegisIconPack(this.icon_pack_dir + "/" + path);
+        } catch (err) {
+          hilog.error(0, 'Index', `Failed to load icon pack ${path}: ${JSON.stringify(err)}`);
         }
-        this.appCtx.eventHub.emit(EVENT_NAMES.ICON_PACK_CHANGED);
-      });
-    });
+      }
+    } catch (err) {
+      hilog.warn(0, 'Index', `Failed to list icon packs: ${JSON.stringify(err)}`);
+    }
+    if (!AppPreference.hasEnabledPacksMigrated()) {
+      const selected = AppPreference.getLegacySelectedPack();
+      if (selected === 0) {
+        TokenIconPacks.enabled_packs = [BUILTIN_DEFAULT_PACK_ID];
+      } else {
+        const index = selected - 1;
+        if (index >= 0 && index < TokenIconPacks.aegis_icon_packs.length) {
+          const uuid = TokenIconPacks.aegis_icon_packs[index].uuid;
+          TokenIconPacks.enabled_packs = uuid ? [uuid] : [BUILTIN_DEFAULT_PACK_ID];
+        } else {
+          TokenIconPacks.enabled_packs = [BUILTIN_DEFAULT_PACK_ID];
+        }
+      }
+      AppPreference.saveEnabledPacks(TokenIconPacks.enabled_packs);
+    } else {
+      TokenIconPacks.enabled_packs = AppPreference.loadEnabledPacks();
+    }
+    this.appCtx.eventHub.emit(EVENT_NAMES.ICON_PACK_CHANGED);
   }
 
   /**
