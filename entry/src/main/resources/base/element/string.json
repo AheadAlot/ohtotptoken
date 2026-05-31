@@ -529,6 +529,10 @@
       "value": "Add New ICON Pack"
     },
     {
+      "name": "setting_icon_pack_edit",
+      "value": "Edit"
+    },
+    {
       "name": "alert_icon_pack_remove_confirm_msg",
       "value": "Confirm to remove icon pack %s?"
     },
@@ -1215,6 +1219,14 @@
     {
       "name": "setting_dlp_anti_peep_unsupported",
       "value": "Your device does not support anti-peep protection"
+    },
+    {
+      "name": "dialog_icon_search_placeholder",
+      "value": "Search icons..."
+    },
+    {
+      "name": "dialog_icon_empty",
+      "value": "No matching icons"
     }
   ]
 }

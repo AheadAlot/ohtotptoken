@@ -533,6 +533,10 @@
       "value": "新增圖示包"
     },
     {
+      "name": "setting_icon_pack_edit",
+      "value": "編輯"
+    },
+    {
       "name": "alert_icon_pack_remove_confirm_msg",
       "value": "確認刪除%s圖示包嗎?"
     },
@@ -1215,6 +1219,14 @@
     {
       "name": "setting_dlp_anti_peep_unsupported",
       "value": "您的设备不支持防窥保护功能"
+    },
+    {
+      "name": "dialog_icon_search_placeholder",
+      "value": "搜尋圖示..."
+    },
+    {
+      "name": "dialog_icon_empty",
+      "value": "無匹配圖示"
     }
   ]
 }

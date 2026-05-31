@@ -17,7 +17,7 @@ import { util, url } from '@kit.ArkTS';
 import lazy { fileIo as fs } from '@kit.CoreFileKit';
 import { BusinessError, systemDateTime } from '@kit.BasicServicesKit';
 import { showSnackBar, SnackBarNotifyType } from '../utils/HdsSnackBarUtils';
-import { AppPreference, TokenPreference, SettingTopEffectType, SettingBottomTabsType, SCROLL_EFFECT_TYPE_MAP, EVENT_NAMES, PREF_KEYS,ROUTE_NAMES } from '../utils/AppPreference';
+import { AppPreference, TokenPreference, SettingTopEffectType, SettingBottomTabsType, SCROLL_EFFECT_TYPE_MAP, EVENT_NAMES, PREF_KEYS, ROUTE_NAMES, BUILTIN_DEFAULT_PACK_ID } from '../utils/AppPreference';
 // [冷启动优化] privacyManager 仅在 deferredInit 的 GetPrivacyManageInfo 中使用
 import lazy { privacyManager } from '@kit.StoreKit';
 import { hilog, hiTraceMeter } from '@kit.PerformanceAnalysisKit';
@@ -397,9 +397,29 @@ struct Index {
   refreshIconPack(): void {
     TokenIconPacks.addUserIconPack(this.user_icon_dir);
     fs.listFile(this.icon_pack_dir).then((paths) => {
-      paths.forEach((path) => {
-        TokenIconPacks.addAegisIconPack(this.icon_pack_dir + "/" + path);
-      })
+      const promises = paths.map((path) =>
+        TokenIconPacks.addAegisIconPack(this.icon_pack_dir + "/" + path)
+      );
+      Promise.all(promises).then(() => {
+        if (!AppPreference.hasEnabledPacksMigrated()) {
+          const selected = AppPreference.getLegacySelectedPack();
+          if (selected === 0) {
+            TokenIconPacks.enabled_packs = [BUILTIN_DEFAULT_PACK_ID];
+          } else {
+            const index = selected - 1;
+            if (index >= 0 && index < TokenIconPacks.aegis_icon_packs.length) {
+              const uuid = TokenIconPacks.aegis_icon_packs[index].uuid;
+              TokenIconPacks.enabled_packs = uuid ? [uuid] : [BUILTIN_DEFAULT_PACK_ID];
+            } else {
+              TokenIconPacks.enabled_packs = [BUILTIN_DEFAULT_PACK_ID];
+            }
+          }
+          AppPreference.saveEnabledPacks(TokenIconPacks.enabled_packs);
+        } else {
+          TokenIconPacks.enabled_packs = AppPreference.loadEnabledPacks();
+        }
+        this.appCtx.eventHub.emit(EVENT_NAMES.ICON_PACK_CHANGED);
+      });
     });
   }
 
@@ -509,6 +529,12 @@ struct Index {
 
   async updateTokenConfig(conf: TokenConfig, toast: boolean = true): Promise<boolean> {
     try {
+      if (!conf.TokenIconPath) {
+        const iconPath = TokenIconPacks.getIconByIssuer(conf.TokenIssuer);
+        if (iconPath !== '') {
+          conf.TokenIconPath = iconPath;
+        }
+      }
       const isNew = !this.CurrentTokens.some(t => t.TokenUUID === conf.TokenUUID);
       await tkStore.updateToken(conf);
       if (isNew) {
