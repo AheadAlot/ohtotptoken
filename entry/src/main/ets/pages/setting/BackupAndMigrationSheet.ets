@@ -20,6 +20,7 @@ import { HuaweiAccountManager } from '../../utils/HuaweiAccountManager';
 import { hdsMaterial, HdsNavigation, HdsNavigationTitleMode, ScrollEffectType } from '@kit.UIDesignKit';
 import { CommonConstants } from '../../utils/CommonConstants';
 import { TokenImporterRegistry, TokenImporter } from '../../utils/importers/TokenImporter';
+import { URIConfigDialog } from '../../dialogs/URIConfigDialog';
 
 @Preview
 @ComponentV2
@@ -39,6 +40,8 @@ export struct BackupAndMigrationSheet {
   private backup_is_input: boolean = true;
   private backup_select_uri: string = '';
   private appCtx = AppStorage.get<common.UIAbilityContext>('appContext') as common.UIAbilityContext;
+  // URI 导入对话框控制器（组件内持有，避免非组件上下文问题）
+  private uriDialogController: CustomDialogController | null = null;
 
   aboutToAppear(): void {
     let bundleInfo = AppStorage.get<bundleManager.BundleInfo>("BundleInfo");
@@ -229,6 +232,7 @@ export struct BackupAndMigrationSheet {
   // 在自定义组件即将析构销毁时将dialogController置空
   aboutToDisappear() {
     this.password_input_dialog = null // 将dialogController置空
+    this.uriDialogController = null
   }
 
   build() {
@@ -285,9 +289,27 @@ export struct BackupAndMigrationSheet {
                       description: importer.description
                     })
                       .onClick(() => {
-                        importer.import(this.getUIContext(), (tokens: Array<TokenConfig>) => {
-                          this.backupReload(tokens);
-                        });
+                        if (importer.id === 'uri') {
+                          // URI 导入需要组件上下文，在此创建 CustomDialogController
+                          this.uriDialogController = new CustomDialogController({
+                            builder: URIConfigDialog({
+                              confirm: async (tokens: Array<TokenConfig>): Promise<boolean> => {
+                                this.backupReload(tokens);
+                                return true;
+                              }
+                            }),
+                            autoCancel: true,
+                            alignment: DialogAlignment.Bottom,
+                            customStyle: false,
+                            cornerRadius: 10,
+                          });
+                          this.uriDialogController.open();
+                        } else {
+                          // 其他导入器（如 TwoFAImporter）使用各自的 import() 方法
+                          importer.import(this.getUIContext(), (tokens: Array<TokenConfig>) => {
+                            this.backupReload(tokens);
+                          });
+                        }
                       })
                   })
                 }
