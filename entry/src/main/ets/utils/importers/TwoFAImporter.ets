@@ -52,7 +52,7 @@ export class TwoFAImporter implements TokenImporter {
   readonly id: string = 'twofa';
   readonly name: ResourceStr = $r('app.string.importer_twofa_name');
   readonly description: ResourceStr = $r('app.string.importer_twofa_desc');
-  readonly icon: Resource = $r('sys.symbol.doc_text');
+  readonly icon: Resource = $r('sys.symbol.transfer');
 
   import(uiContext: UIContext, onTokensImported: (tokens: Array<TokenConfig>) => void): void {
     showSelectFilePicker(1, ['JSON|.json']).then((uris: Array<string>) => {
