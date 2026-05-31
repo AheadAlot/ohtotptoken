@@ -1227,6 +1227,42 @@
     {
       "name": "dialog_icon_empty",
       "value": "無匹配圖示"
+    },
+    {
+      "name": "setting_import_from_other_apps",
+      "value": "從其他驗證器匯入"
+    },
+    {
+      "name": "importer_twofa_name",
+      "value": "2FA驗證器"
+    },
+    {
+      "name": "importer_twofa_desc",
+      "value": "匯入 .json 備份文件（不含密碼）"
+    },
+    {
+      "name": "importer_twofa_invalid_file",
+      "value": "文件格式不正確"
+    },
+    {
+      "name": "importer_twofa_empty",
+      "value": "文件中沒有令牌數據"
+    },
+    {
+      "name": "importer_twofa_decode_failed",
+      "value": "文件解析失敗"
+    },
+    {
+      "name": "importer_twofa_encrypted_unsupported",
+      "value": "暫不支持加密備份文件"
+    },
+    {
+      "name": "importer_uri_name",
+      "value": "貼上URI鏈接"
+    },
+    {
+      "name": "importer_uri_desc",
+      "value": "貼上 otpauth:// 鏈接匯入令牌"
     }
   ]
 }

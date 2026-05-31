@@ -1227,6 +1227,42 @@
     {
       "name": "dialog_icon_empty",
       "value": "No matching icons"
+    },
+    {
+      "name": "setting_import_from_other_apps",
+      "value": "从其他验证器导入"
+    },
+    {
+      "name": "importer_twofa_name",
+      "value": "2FA验证器"
+    },
+    {
+      "name": "importer_twofa_desc",
+      "value": "导入 .json 备份文件（不含密码）"
+    },
+    {
+      "name": "importer_twofa_invalid_file",
+      "value": "文件格式不正确"
+    },
+    {
+      "name": "importer_twofa_empty",
+      "value": "文件中没有令牌数据"
+    },
+    {
+      "name": "importer_twofa_decode_failed",
+      "value": "文件解析失败"
+    },
+    {
+      "name": "importer_twofa_encrypted_unsupported",
+      "value": "暂不支持加密备份文件"
+    },
+    {
+      "name": "importer_uri_name",
+      "value": "粘贴URI链接"
+    },
+    {
+      "name": "importer_uri_desc",
+      "value": "粘贴 otpauth:// 链接导入令牌"
     }
   ]
 }
