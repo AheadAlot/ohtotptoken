@@ -21,6 +21,7 @@ export struct TOTPConfigDialog {
   dialog_icon_config = new CustomDialogController({
     builder: SelectIconDialog({
       issuer: this.conf.TokenIssuer,
+      currentIconPath: this.conf.TokenIconPath,
       confirm: (path) => {
         this.conf.TokenIconPath = path;
       }

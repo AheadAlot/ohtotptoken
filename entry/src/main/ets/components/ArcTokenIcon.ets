@@ -12,8 +12,11 @@ export struct ArcTokenIcon {
   @Param icon_path: string = '';
   @Param bypassColorFilter: boolean = false;
   @Param bypassLogoBackground: boolean = false;
-  @Local icon: ResourceStr | undefined = this.getIconResourceStr(TokenIconPacks.default_icon_pack.getIconPathByIssuer(this.issuer));
-  @Local applyColorFilter: boolean = this.bypassColorFilter ? false : TokenIconPacks.selected_icon_pack === 0;
+  @Local icon: ResourceStr | undefined =
+    (this.icon_path !== '' && this.icon_path !== undefined)
+      ? this.validateUri(this.icon_path)
+      : this.getIconResourceStr(TokenIconPacks.getIconByIssuer(this.issuer));
+  @Local applyColorFilter: boolean = false;
   @Local window: AppWindowInfo = AppStorageV2.connect(AppWindowInfo) as AppWindowInfo;
 
   @Local token_preference: TokenPreference = AppStorageV2.connect(TokenPreference) as TokenPreference;
@@ -77,12 +80,19 @@ export struct ArcTokenIcon {
   }
 
   onIconPackChanged(): void {
-    this.applyColorFilter = this.bypassColorFilter ? false : TokenIconPacks.selected_icon_pack === 0;
-    this.refreshIcon(this.issuer);
+    if (!this.icon_path || this.icon_path === '' || this.validateUri(this.icon_path) === undefined) {
+      this.icon = this.validateUri(TokenIconPacks.getIconByIssuer(this.issuer));
+    }
+    this.applyColorFilter = !this.bypassColorFilter &&
+      (typeof this.icon === 'object');
   }
 
   aboutToAppear(): void {
-    this.refreshIcon(this.issuer);
+    if (this.icon_path && this.icon_path !== '' && this.icon === undefined) {
+      this.icon = this.validateUri(TokenIconPacks.getIconByIssuer(this.issuer));
+    }
+    this.applyColorFilter = !this.bypassColorFilter &&
+      (typeof this.icon === 'object');
     this.iconPackChangedHandler = () => this.onIconPackChanged();
     this.appCtx.eventHub?.on(EVENT_NAMES.ICON_PACK_CHANGED, this.iconPackChangedHandler);
   }

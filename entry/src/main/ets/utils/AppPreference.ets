@@ -5,6 +5,8 @@ import { ScrollEffectType } from "@kit.UIDesignKit";
 /**
  * 事件名称常量
  */
+export const BUILTIN_DEFAULT_PACK_ID = '__builtin_default_pack__';
+
 export enum EVENT_NAMES {
   /** 顶部模糊效果类型变更事件 */
   TOP_EFFECT_TYPE_CHANGED = 'onTopEffectTypeChanged',
@@ -72,8 +74,10 @@ export enum PREF_KEYS {
   CLOUD_SYNC_LAST_TIME = 'app_cloud_sync_last_time',
   /** KV数据库同步时间 */
   DB_KV_SYNC_TIME = 'app_db_kv_sync_time',
-  /** 选中的图标包 */
+  /** 选中的图标包（已废弃，仅用于迁移） */
   APPEARANCE_ICON_PACK_SELECTED = 'app_appearance_icon_pack_selected',
+  /** 已启用的图标包列表（JSON 数组） */
+  APPEARANCE_ICON_PACK_ENABLED = 'app_appearance_icon_pack_enabled',
   /** 隐藏Token开关 */
   SAFETY_HIDE_TOKEN_ENABLE = 'app_safety_hide_token_enable',
   /** 防窥保护开关 */
@@ -565,6 +569,35 @@ export class AppPreference {
       AppPreference.setPreference(entry[0], entry[1]);
     }
     AppPreference.loadTokenAppearance();
+  }
+
+  public static loadEnabledPacks(): string[] {
+    const raw = AppPreference.getPreference(PREF_KEYS.APPEARANCE_ICON_PACK_ENABLED) as string;
+    if (raw && raw !== '') {
+      try {
+        const parsed = JSON.parse(raw) as string[];
+        if (parsed && parsed.length > 0) {
+          return parsed;
+        }
+      } catch (_) {}
+    }
+    return [BUILTIN_DEFAULT_PACK_ID];
+  }
+
+  public static hasEnabledPacksMigrated(): boolean {
+    const enabled = AppPreference.getPreference(PREF_KEYS.APPEARANCE_ICON_PACK_ENABLED) as string;
+    return enabled !== undefined && enabled !== null && enabled !== '';
+  }
+
+  public static getLegacySelectedPack(): number {
+    return Number(AppPreference.getPreference(PREF_KEYS.APPEARANCE_ICON_PACK_SELECTED)) || 0;
+  }
+
+  public static saveEnabledPacks(packs: string[]): void {
+    if (packs.length === 0) {
+      packs = [BUILTIN_DEFAULT_PACK_ID];
+    }
+    AppPreference.setPreference(PREF_KEYS.APPEARANCE_ICON_PACK_ENABLED, JSON.stringify(packs));
   }
 
   public static saveSettings(): void {

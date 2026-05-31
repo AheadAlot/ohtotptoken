@@ -1,49 +1,58 @@
 import { TokenIcon } from "../components/TokenIcon";
-import { AppPreference, PREF_KEYS } from "../utils/AppPreference";
 import { CropModel, CropView } from "../components/ImageCropView";
 import { getImageDimensions, savePixelMapToFile, copyFileToDir } from "../utils/PhotoPickerUtils";
 import { showSelectFilePicker } from "../utils/FileUtils";
 import { AegisIconPack, TokenIconPacks } from "../utils/TokenUtils";
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { LengthMetrics } from '@kit.ArkUI';
+import { showSnackBar, SnackBarNotifyType } from '../utils/HdsSnackBarUtils';
 
 const MAX_ICON_SIZE = 256;
+
+function extractIconName(path: string): string {
+  const lastSep = Math.max(path.lastIndexOf('/'), path.lastIndexOf('\\'));
+  let name = path.substring(lastSep + 1);
+  const dot = name.lastIndexOf('.');
+  if (dot > 0) {
+    name = name.substring(0, dot);
+  }
+  return name.toLowerCase();
+}
 
 @Preview
 @CustomDialog
 export struct SelectIconDialog {
   @Prop @Require issuer: string = '';
+  @Prop currentIconPath: string = '';
   controller?: CustomDialogController;
   cancel?: () => void;
   confirm: (new_conf: string) => void = () => {};
 
   @State selected_icon_path: string = '';
-
-  @State icon_matched_with_issuer: string[] = [''];
-  @State default_icon_pack_visible: boolean = true;
-  @State aegis_icon_pack_visible: boolean[] = [];
+  @State searchText: string = '';
+  @State currentTabIndex: number = 0;
   @State showCropCover: boolean = false;
   @State cropModel: CropModel = new CropModel();
   @State pendingCropUri: string = '';
 
+  private icon_matched_with_issuer: string[] = [''];
   private default_icon_data: MyDataSource = new MyDataSource();
   private user_icon_data: MyDataSource = new MyDataSource();
   private aegis_icon_data: MyDataSource[] = [];
 
   aboutToAppear(): void {
-    // find issuer's icon
+    this.selected_icon_path = this.currentIconPath;
     const default_icon = TokenIconPacks.default_icon_pack.getIconPathByIssuer(this.issuer);
     if (default_icon !== '') {
       this.icon_matched_with_issuer.push(default_icon);
     }
     TokenIconPacks.aegis_icon_packs.forEach((aegis_icon_pack) => {
       const aegis_icon = aegis_icon_pack.getIconPathByIssuer(this.issuer);
-      this.aegis_icon_pack_visible.push(false);
       if (aegis_icon !== '') {
         this.icon_matched_with_issuer.push(aegis_icon);
       }
     });
 
-    // fill data source
     TokenIconPacks.default_icon_pack.default_icon_pack_path.forEach((path) => {
       this.default_icon_data.pushData(path!);
     });
@@ -58,47 +67,53 @@ export struct SelectIconDialog {
         for (let path of icon.icon_pack_path) {
           data_source.pushData(path);
         }
-        this.aegis_icon_data.push(data_source);
       }
+      this.aegis_icon_data.push(data_source);
     });
   }
 
-  @Builder
-  itemHead(text: ResourceStr) {
-    Text(text)
-      .margin({ left: 10, top: 10, bottom: 5 })
-      .fontSize(14)
-      .fontColor($r('sys.color.font_secondary'))
+  private filterPaths(paths: string[], query: string): string[] {
+    if (query === '') {
+      return paths;
+    }
+    const q = query.toLowerCase();
+    return paths.filter(p => extractIconName(p).includes(q));
+  }
+
+  private getFilteredDefaultPaths(): string[] {
+    const all: string[] = [];
+    for (let i = 0; i < this.default_icon_data.totalCount(); i++) {
+      all.push(this.default_icon_data.getData(i));
+    }
+    return this.filterPaths(all, this.searchText);
+  }
+
+  private getFilteredAegisPaths(index: number): string[] {
+    if (index >= this.aegis_icon_data.length) {
+      return [];
+    }
+    const ds = this.aegis_icon_data[index];
+    const all: string[] = [];
+    for (let i = 0; i < ds.totalCount(); i++) {
+      all.push(ds.getData(i));
+    }
+    return this.filterPaths(all, this.searchText);
   }
 
   @Builder
-  ItemIcon(path: string, visible: boolean, removable: boolean) {
-    ListItem() {
-      Stack( { alignContent: Alignment.TopStart } ) {
-        if (path === '') {
-          Shape() {
-            Text($r('app.string.dialog_icon_select_auto'))
-          }
-          .align(Alignment.Center)
-          .backgroundColor($r('app.color.item_bg'))
-          .height(40)
-          .width(40)
-          .borderRadius(20)
-        } else {
-          TokenIcon({ issuer: '', icon_path: path, bypassColorFilter: true, bypassLogoBackground: true })
-        }
-
+  ItemIconOverlay(path: string, removable: boolean) {
+    Stack({ alignContent: Alignment.Bottom }) {
+      Row() {
         Button({ type: ButtonType.Circle }) {
           SymbolGlyph($r('sys.symbol.plus'))
-            .fontSize(15)
+            .fontSize(LengthMetrics.vp(12).value)
             .fontColor([Color.White])
             .fontWeight(FontWeight.Medium)
             .rotate({ angle: 45 })
         }
         .backgroundColor(Color.Red)
-        .width(20)
-        .height(20)
-        .margin({ left: 0, top: 0 })
+        .width(LengthMetrics.vp(16).value)
+        .height(LengthMetrics.vp(16).value)
         .visibility(removable ? Visibility.Visible : Visibility.Hidden)
         .onClick(() => {
           this.getUIContext().showAlertDialog({
@@ -123,86 +138,149 @@ export struct SelectIconDialog {
           })
         })
 
-        Radio({ value: '', group: 'icon' })
-          .width(20)
-          .height(20)
-          .margin({ left: 20, top: 20 })
+        Blank()
+
+        Radio({ value: path, group: 'icon' })
+          .checked(this.selected_icon_path === path)
+          .width(LengthMetrics.vp(16).value)
+          .height(LengthMetrics.vp(16).value)
           .onChange((checked) => {
             if (checked) {
               this.selected_icon_path = path;
             }
           })
       }
-      .visibility(visible ? Visibility.Visible : Visibility.Hidden)
+      .width('100%')
     }
-    .margin({ left: 10 })
+    .width('100%')
+    .height('100%')
   }
 
-  /**
-   * 自定义图标添加按钮
-   * 流程: DocumentViewPicker选择文件 -> getImageDimensions获取尺寸
-   * - 尺寸 > 128x128: 通过bindContentCover弹出裁剪界面(CropView)，裁剪后保存
-   * - 尺寸 <= 128x128: 直接复制到用户图标目录
-   * - 无法获取尺寸(SVG等): 降级直接复制
-   */
+  @Builder
+  ItemIcon(path: string, removable: boolean) {
+    Stack() {
+      if (path === '') {
+        Shape() {
+          Text($r('app.string.dialog_icon_select_auto'))
+        }
+        .align(Alignment.Center)
+        .backgroundColor($r('app.color.item_bg'))
+        .height(LengthMetrics.vp(40).value)
+        .width(LengthMetrics.vp(40).value)
+        .borderRadius(LengthMetrics.vp(20).value)
+      } else {
+        TokenIcon({ issuer: '', icon_path: path, bypassColorFilter: true, bypassLogoBackground: true })
+      }
+    }
+    .width(LengthMetrics.vp(40).value)
+    .height(LengthMetrics.vp(40).value)
+    .alignContent(Alignment.Center)
+    .overlay(this.ItemIconOverlay(path, removable), { align: Alignment.Bottom })
+  }
+
+  private async addIconToUserPack(uri: string): Promise<void> {
+    const destPath = await copyFileToDir(uri, TokenIconPacks.user_added_icon_packs.user_icon_path);
+    TokenIconPacks.user_added_icon_packs.addIconByPath(destPath);
+    this.user_icon_data.pushData(destPath);
+  }
+
   @Builder
   ItemIconAddButton() {
-    ListItem() {
-      Button({ type: ButtonType.Circle }) {
-        SymbolGlyph($r('sys.symbol.plus'))
-          .fontSize(30)
-          .fontWeight(FontWeight.Bold)
-          .fontColor([Color.Gray])
-      }
-      .backgroundColor(Color.Transparent)
-      .shadow({ radius: 10, color: Color.Gray })
-      .width(40)
-      .height(40)
-      .onClick(async () => {
-        try {
-          const uris = await showSelectFilePicker(1, ['png', 'jpg', 'jpeg', 'svg', 'webp']);
-          if (uris.length === 0) {
-            return;
-          }
-          const uri = uris[0];
-          const isSvg = uri.toLowerCase().endsWith('.svg');
-          if (isSvg) {
-            const destPath = await copyFileToDir(uri, TokenIconPacks.user_added_icon_packs.user_icon_path);
-            TokenIconPacks.user_added_icon_packs.addIconByPath(destPath);
-            this.user_icon_data.pushData(destPath);
-            return;
-          }
-          const dims = await getImageDimensions(uri);
-          if (dims === null) {
-            hilog.warn(0, 'SelectIconDialog', 'Cannot get image dimensions, copying directly');
-            const destPath = await copyFileToDir(uri, TokenIconPacks.user_added_icon_packs.user_icon_path);
-            TokenIconPacks.user_added_icon_packs.addIconByPath(destPath);
-            this.user_icon_data.pushData(destPath);
-            return;
-          }
-          if (dims.width > MAX_ICON_SIZE || dims.height > MAX_ICON_SIZE) {
-            this.pendingCropUri = uri;
-            this.cropModel = new CropModel();
-            this.cropModel.setImage(uri).setFrameWidth(1000).setFrameRatio(1);
-            this.showCropCover = true;
-          } else {
-            const destPath = await copyFileToDir(uri, TokenIconPacks.user_added_icon_packs.user_icon_path);
-            TokenIconPacks.user_added_icon_packs.addIconByPath(destPath);
-            this.user_icon_data.pushData(destPath);
-          }
-        } catch (e) {
-          hilog.error(0, 'SelectIconDialog', 'Add icon error: ' + JSON.stringify(e));
-        }
-      })
+    Button({ type: ButtonType.Circle }) {
+      SymbolGlyph($r('sys.symbol.plus'))
+        .fontSize(LengthMetrics.vp(30).value)
+        .fontWeight(FontWeight.Bold)
+        .fontColor([Color.Gray])
     }
-    .margin({ left: 10 })
+    .backgroundColor(Color.Transparent)
+    .shadow({ radius: LengthMetrics.vp(10).value, color: Color.Gray })
+    .width(LengthMetrics.vp(40).value)
+    .height(LengthMetrics.vp(40).value)
+    .onClick(async () => {
+      try {
+        const uris = await showSelectFilePicker(1, ['png', 'jpg', 'jpeg', 'svg', 'webp']);
+        if (uris.length === 0) {
+          return;
+        }
+        const uri = uris[0];
+        const isSvg = uri.toLowerCase().endsWith('.svg');
+        if (isSvg) {
+          await this.addIconToUserPack(uri);
+          return;
+        }
+        const dims = await getImageDimensions(uri);
+        if (dims === null) {
+          hilog.warn(0, 'SelectIconDialog', 'Cannot get image dimensions, copying directly');
+          await this.addIconToUserPack(uri);
+          return;
+        }
+        if (dims.width > MAX_ICON_SIZE || dims.height > MAX_ICON_SIZE) {
+          this.pendingCropUri = uri;
+          this.cropModel = new CropModel();
+          this.cropModel.setImage(uri).setFrameWidth(1000).setFrameRatio(1);
+          this.showCropCover = true;
+        } else {
+          await this.addIconToUserPack(uri);
+        }
+      } catch (e) {
+        hilog.error(0, 'SelectIconDialog', 'Add icon error: ' + JSON.stringify(e));
+        const msg = e instanceof Error ? e.message : `${e}`;
+        showSnackBar(msg, SnackBarNotifyType.ERROR);
+      }
+    })
   }
 
-  /**
-   * 图片裁剪全屏覆盖层
-   * 使用CropView显示图片+圆形取景框，用户通过拖动/缩放调整裁剪区域
-   * 确认后: cropModel.crop()裁剪PixelMap -> savePixelMapToFile()保存PNG到用户图标目录
-   */
+  @Builder
+  RecommendRow() {
+    Row() {
+      Text($r('app.string.dialog_icon_recommend'))
+        .fontSize(LengthMetrics.vp(14).value)
+        .fontColor($r('sys.color.font_secondary'))
+        .constraintSize({ maxWidth: LengthMetrics.vp(50).value })
+      Scroll() {
+        Row({ space: LengthMetrics.vp(8).value }) {
+          ForEach(this.icon_matched_with_issuer, (path: string) => {
+            this.ItemIcon(path, false)
+          }, (path: string) => path)
+        }
+      }
+      .scrollable(ScrollDirection.Horizontal)
+      .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+      .layoutWeight(1)
+    }
+    .width('100%')
+    .height(LengthMetrics.vp(54).value)
+    .padding({ top: LengthMetrics.vp(7).value, bottom: LengthMetrics.vp(7).value, left: LengthMetrics.vp(8).value, right: LengthMetrics.vp(8).value })
+    .alignItems(VerticalAlign.Center)
+  }
+
+  @Builder
+  CustomRow() {
+    Row() {
+      Text($r('app.string.dialog_icon_select_custom'))
+        .fontSize(LengthMetrics.vp(14).value)
+        .fontColor($r('sys.color.font_secondary'))
+        .constraintSize({ maxWidth: LengthMetrics.vp(50).value })
+      Scroll() {
+        Row({ space: LengthMetrics.vp(8).value }) {
+          this.ItemIconAddButton()
+          LazyForEach(this.user_icon_data, (path: string) => {
+            this.ItemIcon(path, true)
+          }, (path: string) => path)
+        }
+      }
+      .scrollable(ScrollDirection.Horizontal)
+      .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+      .layoutWeight(1)
+    }
+    .width('100%')
+    .height(LengthMetrics.vp(54).value)
+    .padding({ top: LengthMetrics.vp(7).value, bottom: LengthMetrics.vp(7).value, left: LengthMetrics.vp(8).value, right: LengthMetrics.vp(8).value })
+    .alignItems(VerticalAlign.Center)
+  }
+
   @Builder
   CropCoverBuilder() {
     Column() {
@@ -235,58 +313,128 @@ export struct SelectIconDialog {
           })
       }
       .width('100%')
-      .padding({ left: 20, right: 20, bottom: 30 })
+      .padding({ left: LengthMetrics.vp(20).value, right: LengthMetrics.vp(20).value, bottom: LengthMetrics.vp(30).value })
     }
     .width('100%')
     .height('100%')
     .backgroundColor(Color.Black)
   }
 
-  build() {
-    Column() {
-      List({ space: 10 }) {
-        ListItemGroup({ header: this.itemHead($r('app.string.dialog_icon_recommend')) }) {
-          ForEach(this.icon_matched_with_issuer, (icon_path: string) => {
-            this.ItemIcon(icon_path, true, false)
-          })
+  @Builder
+  LazyIconList(dataSource: MyDataSource) {
+    List({ space: LengthMetrics.vp(8).value }) {
+      LazyForEach(dataSource, (path: string) => {
+        ListItem() {
+          this.ItemIcon(path, false)
         }
-        ListItemGroup({ header: this.itemHead(TokenIconPacks.user_added_icon_packs.name) }) {
-          LazyForEach(this.user_icon_data, (path: string) => {
-            this.ItemIcon(path, true, true)
-          })
+      }, (path: string) => path)
+    }
+    .lanes({ minLength: LengthMetrics.vp(40).value, maxLength: LengthMetrics.vp(40).value })
+    .width('100%')
+    .layoutWeight(1)
+    .scrollBar(BarState.Auto)
+    .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+  }
+
+  @Builder
+  IconGrid(paths: string[], removable: boolean, showAddButton: boolean) {
+    if (paths.length === 0 && !showAddButton) {
+      Column() {
+        Text($r('app.string.dialog_icon_empty'))
+          .fontSize(LengthMetrics.vp(14).value)
+          .fontColor($r('sys.color.font_secondary'))
+          .margin({ top: LengthMetrics.vp(30).value })
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Center)
+    } else {
+      Flex({ wrap: FlexWrap.Wrap }) {
+        if (showAddButton) {
           this.ItemIconAddButton()
         }
-        .onClick(() => {
-          this.default_icon_pack_visible = !this.default_icon_pack_visible;
+        ForEach(paths, (path: string) => {
+          this.ItemIcon(path, removable)
+        }, (path: string) => path)
+      }
+      .padding({ left: LengthMetrics.vp(8).value, right: LengthMetrics.vp(8).value, top: LengthMetrics.vp(8).value })
+    }
+  }
+
+  @Builder
+  TabBuilder(title: ResourceStr, index: number) {
+    Column() {
+      Text(title)
+        .fontSize(LengthMetrics.vp(14).value)
+        .fontWeight(this.currentTabIndex === index ? FontWeight.Medium : FontWeight.Normal)
+        .fontColor(this.currentTabIndex === index ? $r('sys.color.font_primary') : $r('sys.color.font_secondary'))
+        .maxLines(1)
+        .textOverflow({ overflow: TextOverflow.Ellipsis })
+        .constraintSize({ maxWidth: LengthMetrics.vp(80).value })
+    }
+    .padding({ left: LengthMetrics.vp(12).value, right: LengthMetrics.vp(12).value, top: LengthMetrics.vp(8).value, bottom: LengthMetrics.vp(8).value })
+  }
+
+  build() {
+    Column() {
+      Search({ placeholder: $r('app.string.dialog_icon_search_placeholder') })
+        .width('100%')
+        .height(LengthMetrics.vp(40).value)
+        .margin({ bottom: LengthMetrics.vp(4).value })
+        .searchButton($r('app.string.dialog_icon_search_placeholder'))
+        .onChange((value: string) => {
+          this.searchText = value;
         })
-        ListItemGroup({ header: this.itemHead(TokenIconPacks.default_icon_pack.name) }) {
-          LazyForEach(this.default_icon_data, (path: string) => {
-            this.ItemIcon(path, true, false)
-          })
-        }
-        .onClick(() => {
-          this.default_icon_pack_visible = !this.default_icon_pack_visible;
+        .onSubmit((value: string) => {
+          this.searchText = value;
         })
-        ForEach(TokenIconPacks.aegis_icon_packs, (aegis_icon_pack: AegisIconPack, index: number) => {
-          ListItemGroup({ header: this.itemHead(aegis_icon_pack.name) }) {
-            LazyForEach(this.aegis_icon_data[index], (path: string) => {
-              this.ItemIcon(path, true, false)
-            })
+
+      this.RecommendRow()
+      this.CustomRow()
+
+      Tabs({ barPosition: BarPosition.Start }) {
+        TabContent() {
+          if (this.searchText === '') {
+            this.LazyIconList(this.default_icon_data)
+          } else {
+            Scroll() {
+              this.IconGrid(this.getFilteredDefaultPaths(), false, false)
+            }
+            .scrollBar(BarState.Auto)
+            .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+            .width('100%')
+            .layoutWeight(1)
           }
-          .onClick(() => {
-            this.aegis_icon_pack_visible[index] = !this.aegis_icon_pack_visible[index];
-          })
+        }
+        .tabBar(this.TabBuilder(TokenIconPacks.default_icon_pack.name, 0))
+
+        ForEach(TokenIconPacks.aegis_icon_packs, (aegis_icon_pack: AegisIconPack, index: number) => {
+          TabContent() {
+            if (this.searchText === '' && index < this.aegis_icon_data.length) {
+              this.LazyIconList(this.aegis_icon_data[index])
+            } else {
+              Scroll() {
+                this.IconGrid(this.getFilteredAegisPaths(index), false, false)
+              }
+              .scrollBar(BarState.Auto)
+              .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+              .width('100%')
+              .layoutWeight(1)
+            }
+          }
+          .tabBar(this.TabBuilder(aegis_icon_pack.name, 1 + index))
         }, (aegis_icon_pack: AegisIconPack) => {
           return aegis_icon_pack.on_device_path;
         })
       }
-      .lanes({ minLength: 50, maxLength: 50 })
-      .width('100%')
-      .height('100%')
-      .chainAnimation(AppPreference.getPreference(PREF_KEYS.APPEARANCE_CHAIN_ANIMATION_ENABLE) as boolean)
-      .scrollBar(BarState.Off)
-      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+      .scrollable(true)
+      .barMode(BarMode.Scrollable)
+      .barHeight(LengthMetrics.vp(48).value)
       .layoutWeight(1)
+      .animationDuration(200)
+      .onChange((index: number) => {
+        this.currentTabIndex = index;
+      })
+
       Flex({ justifyContent: FlexAlign.SpaceAround }) {
         Button($r('app.string.dialog_btn_cancel'))
           .fontColor($r('app.color.item_fg'))
@@ -309,7 +457,7 @@ export struct SelectIconDialog {
           .width('100%')
       }
     }
-    .padding(10)
+    .padding(LengthMetrics.vp(10).value)
     .width('100%')
     .bindContentCover(this.showCropCover, this.CropCoverBuilder(), {
       modalTransition: ModalTransition.DEFAULT,
@@ -320,7 +468,6 @@ export struct SelectIconDialog {
   }
 }
 
-// BasicDataSource实现了IDataSource接口，用于管理listener监听，以及通知LazyForEach数据更新
 class BasicDataSource implements IDataSource {
   private listeners: DataChangeListener[] = [];
   private originDataArray: string[] = [];
@@ -333,7 +480,6 @@ class BasicDataSource implements IDataSource {
     return this.originDataArray[index];
   }
 
-  // 该方法为框架侧调用，为LazyForEach组件向其数据源处添加listener监听
   registerDataChangeListener(listener: DataChangeListener): void {
     if (this.listeners.indexOf(listener) < 0) {
       hilog.info(0, 'SelectIconDialog', 'add listener');
@@ -341,7 +487,6 @@ class BasicDataSource implements IDataSource {
     }
   }
 
-  // 该方法为框架侧调用，为对应的LazyForEach组件在数据源处去除listener监听
   unregisterDataChangeListener(listener: DataChangeListener): void {
     const pos = this.listeners.indexOf(listener);
     if (pos >= 0) {
@@ -350,43 +495,33 @@ class BasicDataSource implements IDataSource {
     }
   }
 
-  // 通知LazyForEach组件需要重载所有子组件
   notifyDataReload(): void {
     this.listeners.forEach(listener => {
       listener.onDataReloaded();
     })
   }
 
-  // 通知LazyForEach组件需要在index对应索引处添加子组件
   notifyDataAdd(index: number): void {
     this.listeners.forEach(listener => {
       listener.onDataAdd(index);
-      // 写法2：listener.onDatasetChange([{type: DataOperationType.ADD, index: index}]);
     })
   }
 
-  // 通知LazyForEach组件在index对应索引处数据有变化，需要重建该子组件
   notifyDataChange(index: number): void {
     this.listeners.forEach(listener => {
       listener.onDataChange(index);
-      // 写法2：listener.onDatasetChange([{type: DataOperationType.CHANGE, index: index}]);
     })
   }
 
-  // 通知LazyForEach组件需要在index对应索引处删除该子组件
   notifyDataDelete(index: number): void {
     this.listeners.forEach(listener => {
       listener.onDataDelete(index);
-      // 写法2：listener.onDatasetChange([{type: DataOperationType.DELETE, index: index}]);
     })
   }
 
-  // 通知LazyForEach组件将from索引和to索引处的子组件进行交换
   notifyDataMove(from: number, to: number): void {
     this.listeners.forEach(listener => {
       listener.onDataMove(from, to);
-      // 写法2：listener.onDatasetChange(
-      //         [{type: DataOperationType.EXCHANGE, index: {start: from, end: to}}]);
     })
   }
 
