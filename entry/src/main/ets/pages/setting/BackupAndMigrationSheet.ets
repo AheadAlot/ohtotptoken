@@ -294,17 +294,19 @@ export struct BackupAndMigrationSheet {
                       .onClick(() => {
                         if (importer.id === 'uri') {
                           // URI 导入需要组件上下文，在此创建 CustomDialogController
-                          this.uriDialogController = new CustomDialogController({
-                            builder: URIConfigDialog({
-                              confirm: async (tokens: Array<TokenConfig>): Promise<boolean> => {
-                                this.backupReload(tokens);
-                                return true;
-                              }
-                            }),
-                            autoCancel: true,
-                            customStyle: false,
-                            cornerRadius: 10,
-                          });
+                          if (!this.uriDialogController) {
+                            this.uriDialogController = new CustomDialogController({
+                              builder: URIConfigDialog({
+                                confirm: async (tokens: Array<TokenConfig>): Promise<boolean> => {
+                                  this.backupReload(tokens);
+                                  return true;
+                                }
+                              }),
+                              autoCancel: true,
+                              customStyle: false,
+                              cornerRadius: 10,
+                            });
+                          }
                           this.uriDialogController.open();
                         } else {
                           // 其他导入器（如 TwoFAImporter）使用各自的 import() 方法
@@ -313,7 +315,7 @@ export struct BackupAndMigrationSheet {
                           });
                         }
                       })
-                  })
+                  }, (importer: TokenImporter) => importer.id)
                 }
               }
               .padding({ left: 10, right: 10 })

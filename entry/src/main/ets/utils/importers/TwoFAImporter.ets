@@ -61,7 +61,8 @@ export class TwoFAImporter implements TokenImporter {
       }
       this.parseFile(uris[0], onTokensImported);
     }).catch((err: BusinessError) => {
-      hilog.error(err.code, TAG, `File picker failed: ${err.message}`);
+      hilog.error(0x0000, TAG, `File picker failed: ${err.message}`);
+      showSnackBar($r('app.string.importer_twofa_decode_failed'), SnackBarNotifyType.ERROR);
     });
   }
 
@@ -88,7 +89,7 @@ export class TwoFAImporter implements TokenImporter {
       const backup: TwoFABackup = JSON.parse(jsonStr);
 
       // 魔数校验
-      if (backup.magic !== MAGIC_TWOFA) {
+      if (!backup || backup.magic !== MAGIC_TWOFA) {
         showSnackBar($r('app.string.importer_twofa_invalid_file'), SnackBarNotifyType.ERROR);
         return;
       }
@@ -106,23 +107,27 @@ export class TwoFAImporter implements TokenImporter {
       }
 
       // 字段映射：TwoFATokenRaw → TokenConfig
-      const tokens = rawTokens.map((raw: TwoFATokenRaw): TokenConfig => {
-        let token = new TokenConfig();
-        token.TokenSecret = raw.secret;
-        token.TokenIssuer = raw.issuer || 'Unknown';
-        token.TokenName = raw.label || 'Unknown';
-        token.TokenAlgorithm = raw.algorithm as HMACAlgorithm;
-        token.TokenDigits = raw.digits || 6;
-        token.TokenPeriod = raw.span || 30;
-        token.TokenType = raw.type === 0 ? otpType.TOTP : otpType.HOTP;
-        token.TokenUUID = util.generateRandomUUID();
-        return token;
-      });
+      const SUPPORTED_ALGOS: string[] = ['SHA1', 'SHA224', 'SHA256', 'SHA384', 'SHA512', 'SM3', 'MD5'];
+      const tokens = rawTokens
+        .filter((raw: TwoFATokenRaw): boolean => raw !== null && raw.secret !== null && raw.secret.length > 0)
+        .map((raw: TwoFATokenRaw): TokenConfig => {
+          let token = new TokenConfig();
+          token.TokenSecret = raw.secret;
+          token.TokenIssuer = raw.issuer || 'Unknown';
+          token.TokenName = raw.label || 'Unknown';
+          const algo = (raw.algorithm || 'SHA1').toUpperCase();
+          token.TokenAlgorithm = (SUPPORTED_ALGOS.includes(algo) ? algo : 'SHA1') as HMACAlgorithm;
+          token.TokenDigits = raw.digits || 6;
+          token.TokenPeriod = raw.span || 30;
+          token.TokenType = raw.type === 0 ? otpType.TOTP : otpType.HOTP;
+          token.TokenUUID = util.generateRandomUUID();
+          return token;
+        });
 
       onTokensImported(tokens);
     } catch (err) {
-      const error = err as BusinessError;
-      hilog.error(error.code, TAG, `Parse failed: ${error.message}`);
+      const error = err as Error;
+      hilog.error(0x0000, TAG, `Parse failed: ${error.message}`);
       showSnackBar($r('app.string.importer_twofa_decode_failed'), SnackBarNotifyType.ERROR);
     }
   }
