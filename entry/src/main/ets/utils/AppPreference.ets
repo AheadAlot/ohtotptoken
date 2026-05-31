@@ -575,7 +575,10 @@ export class AppPreference {
     const raw = AppPreference.getPreference(PREF_KEYS.APPEARANCE_ICON_PACK_ENABLED) as string;
     if (raw && raw !== '') {
       try {
-        return JSON.parse(raw) as string[];
+        const parsed = JSON.parse(raw) as string[];
+        if (parsed && parsed.length > 0) {
+          return parsed;
+        }
       } catch (_) {}
     }
     return [BUILTIN_DEFAULT_PACK_ID];

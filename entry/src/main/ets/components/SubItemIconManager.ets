@@ -387,19 +387,23 @@ export struct SubItemIconManager {
                       const out_path = this.icon_pack_dir + "/" + file_name;
                       fs.mkdir(out_path).then(() => {
                         zlib.decompressFile(fd.path, out_path).then(() => {
-                          TokenIconPacks.addAegisIconPack(out_path).then(() => {
-                            this.syncFromTokenIconPacks();
-                            TokenIconPacks.notifyChanged();
-                            fs.close(fd.fd);
-                          }).catch(() => {
-                            fs.rmdir(out_path);
-                            fs.close(fd.fd);
-                          });
-                        }).catch((reason: BusinessError) => {
-                          showSnackBar(reason.message ?? `${reason}`, SnackBarNotifyType.ERROR);
-                          fs.close(fd.fd);
+                          return TokenIconPacks.addAegisIconPack(out_path);
+                        }).then(() => {
+                          this.syncFromTokenIconPacks();
+                          TokenIconPacks.notifyChanged();
+                        }).catch((err: BusinessError) => {
+                          hilog.error(0, 'SubItemIconManager', 'Failed to add icon pack: ' + JSON.stringify(err));
+                          showSnackBar(err.message ?? `${err}`, SnackBarNotifyType.ERROR);
+                          fs.rmdir(out_path).catch(() => {});
+                        }).finally(() => {
+                          fs.close(fd.fd).catch(() => {});
                         });
+                      }).catch((err: BusinessError) => {
+                        showSnackBar(err.message ?? `${err}`, SnackBarNotifyType.ERROR);
+                        fs.close(fd.fd).catch(() => {});
                       });
+                    }).catch((err: BusinessError) => {
+                      showSnackBar(err.message ?? `${err}`, SnackBarNotifyType.ERROR);
                     });
                   });
                 });

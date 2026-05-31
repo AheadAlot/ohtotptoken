@@ -399,6 +399,9 @@ export class TokenIconPacks {
     return readFileContent(icon_path_json).then((val) => {
       let pack: AegisIconPack = new AegisIconPack();
       const tmp = JSON.parse(val) as AegisIconPack;
+      if (!tmp || !tmp.name) {
+        throw new Error('Invalid icon pack JSON');
+      }
       const fallbackUuid = `${tmp.name ?? 'pack'}_${path.split('/').pop()}`;
       const rawUuid = tmp.uuid ?? fallbackUuid;
       pack.uuid = rawUuid.startsWith('__builtin_') ? 'ext_' + rawUuid : rawUuid;

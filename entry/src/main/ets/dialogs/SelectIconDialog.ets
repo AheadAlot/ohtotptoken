@@ -5,6 +5,7 @@ import { showSelectFilePicker } from "../utils/FileUtils";
 import { AegisIconPack, TokenIconPacks } from "../utils/TokenUtils";
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { LengthMetrics } from '@kit.ArkUI';
+import { showSnackBar, SnackBarNotifyType } from '../utils/HdsSnackBarUtils';
 
 const MAX_ICON_SIZE = 256;
 
@@ -223,6 +224,8 @@ export struct SelectIconDialog {
         }
       } catch (e) {
         hilog.error(0, 'SelectIconDialog', 'Add icon error: ' + JSON.stringify(e));
+        const msg = e instanceof Error ? e.message : `${e}`;
+        showSnackBar(msg, SnackBarNotifyType.ERROR);
       }
     })
   }
