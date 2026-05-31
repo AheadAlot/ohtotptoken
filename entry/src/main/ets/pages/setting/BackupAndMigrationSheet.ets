@@ -244,7 +244,7 @@ export struct BackupAndMigrationSheet {
               .height(CommonConstants.AVOID_TOP_BASE_HEIGHT)
 
             ListItem() {
-              SettingItem({ title: "" }) {
+              SettingItem({ title: $r('app.string.setting_backup') }) {
                 SubItemButton({
                   symbol: $r('sys.symbol.save'),
                   text: $r('app.string.setting_backup_export')
@@ -282,7 +282,10 @@ export struct BackupAndMigrationSheet {
             if (this.importers.length > 0) {
               ListItem() {
                 SettingItem({ title: $r('app.string.setting_import_from_other_apps') }) {
-                  ForEach(this.importers, (importer: TokenImporter) => {
+                  ForEach(this.importers, (importer: TokenImporter, index: number) => {
+                    if (index > 0) {
+                      SubItemDivider()
+                    }
                     SubItemButton({
                       symbol: importer.icon,
                       text: importer.name,
@@ -317,7 +320,7 @@ export struct BackupAndMigrationSheet {
             }
 
             ListItem() {
-              SettingItem({ title: "" }) {
+              SettingItem({ title: $r('app.string.data_rdb_cloud_sync') }) {
                 SubItemToggle({
                   icon: $r('sys.symbol.icloud'),
                   title: $r('app.string.data_rdb_cloud_sync'),
