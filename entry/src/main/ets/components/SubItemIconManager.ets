@@ -393,6 +393,7 @@ export struct SubItemIconManager {
                             fs.close(fd.fd);
                           }).catch(() => {
                             fs.rmdir(out_path);
+                            fs.close(fd.fd);
                           });
                         }).catch((reason: BusinessError) => {
                           showSnackBar(reason.message ?? `${reason}`, SnackBarNotifyType.ERROR);

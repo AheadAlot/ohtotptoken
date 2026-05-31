@@ -392,6 +392,9 @@ struct Index {
     fs.listFile(this.icon_pack_dir).then((paths) => {
       const promises = paths.map((path) =>
         TokenIconPacks.addAegisIconPack(this.icon_pack_dir + "/" + path)
+          .catch((err: BusinessError) => {
+            hilog.error(0, 'Index', `Failed to load icon pack ${path}: ${JSON.stringify(err)}`);
+          })
       );
       Promise.all(promises).then(() => {
         if (!AppPreference.hasEnabledPacksMigrated()) {

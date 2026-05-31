@@ -80,19 +80,19 @@ export struct ArcTokenIcon {
   }
 
   onIconPackChanged(): void {
+    if (!this.icon_path || this.icon_path === '' || this.validateUri(this.icon_path) === undefined) {
+      this.icon = this.validateUri(TokenIconPacks.getIconByIssuer(this.issuer));
+    }
     this.applyColorFilter = !this.bypassColorFilter &&
       (typeof this.icon === 'string' && this.icon.startsWith('rawfile://'));
-    if (!this.icon_path || this.icon_path === '') {
-      this.refreshIcon(this.issuer);
-    }
   }
 
   aboutToAppear(): void {
+    if (this.icon_path && this.icon_path !== '' && this.icon === undefined) {
+      this.icon = this.validateUri(TokenIconPacks.getIconByIssuer(this.issuer));
+    }
     this.applyColorFilter = !this.bypassColorFilter &&
       (typeof this.icon === 'string' && this.icon.startsWith('rawfile://'));
-    if (this.icon_path && this.icon_path !== '' && this.icon === undefined) {
-      this.refreshIcon(this.issuer);
-    }
     this.iconPackChangedHandler = () => this.onIconPackChanged();
     this.appCtx.eventHub?.on(EVENT_NAMES.ICON_PACK_CHANGED, this.iconPackChangedHandler);
   }
