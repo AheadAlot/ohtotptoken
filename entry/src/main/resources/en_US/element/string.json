@@ -1215,6 +1215,42 @@
     {
       "name": "setting_dlp_anti_peep_unsupported",
       "value": "Your device does not support anti-peep protection"
+    },
+    {
+      "name": "setting_import_from_other_apps",
+      "value": "Import from other apps"
+    },
+    {
+      "name": "importer_twofa_name",
+      "value": "2FA Authenticator"
+    },
+    {
+      "name": "importer_twofa_desc",
+      "value": "Import .json backup file (non-encrypted)"
+    },
+    {
+      "name": "importer_twofa_invalid_file",
+      "value": "Invalid file format"
+    },
+    {
+      "name": "importer_twofa_empty",
+      "value": "No token data in file"
+    },
+    {
+      "name": "importer_twofa_decode_failed",
+      "value": "Failed to parse file"
+    },
+    {
+      "name": "importer_twofa_encrypted_unsupported",
+      "value": "Encrypted backups not supported"
+    },
+    {
+      "name": "importer_uri_name",
+      "value": "Paste URI link"
+    },
+    {
+      "name": "importer_uri_desc",
+      "value": "Paste otpauth:// URIs to import"
     }
   ]
 }

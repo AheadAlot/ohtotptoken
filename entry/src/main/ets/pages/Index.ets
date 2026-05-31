@@ -64,7 +64,6 @@ import { LengthMetrics } from '@kit.ArkUI';
 import lazy { decodeProtobuf } from '../utils/GoogleAuthUtils';
 // [冷启动优化] 各添加 Token 弹框仅在用户点击添加时触发评估
 import lazy { TOTPConfigDialog } from '../dialogs/OTPConfigDialog';
-import lazy { URIConfigDialog } from '../dialogs/URIConfigDialog';
 import lazy { FortiConfigDialog } from '../dialogs/FortiConfigDialog';
 import lazy { SteamConfigDialog } from '../dialogs/SteamConfigDialog';
 import { CommonConstants } from '../utils/CommonConstants';
@@ -89,11 +88,6 @@ function TokenAddMenuBuilder(host: Index) {
         host.openTotpAddDialog();
       })
       .accessibilityText($r('app.string.tab_token_add_key'))
-    MenuItem({ content: $r('app.string.tab_token_add_uri') })
-      .onClick(() => {
-        host.openUriAddDialog();
-      })
-      .accessibilityText($r('app.string.tab_token_add_uri'))
     MenuItem({ content: $r('app.string.tab_token_add_forti_key') })
       .onClick(() => {
         host.openFortiAddDialog();
@@ -202,7 +196,6 @@ struct Index {
 
   private backup_select_uri: string = '';
   private readonly addTokenMenuTargetId: string = 'app_ua_add_token';
-  private dialog_uri_config?: CustomDialogController;
   private dialog_totp_config?: CustomDialogController;
   private dialog_forti_config?: CustomDialogController;
   private dialog_steam_config?: CustomDialogController;
@@ -680,17 +673,6 @@ struct Index {
       })
     })
     this.dialog_totp_config.open()
-  }
-
-  openUriAddDialog(): void {
-    this.dialog_uri_config = new CustomDialogController({
-      builder: URIConfigDialog({
-        confirm: async (tokens): Promise<boolean> => {
-          return await this.updateTokenConfigs(tokens);
-        }
-      })
-    })
-    this.dialog_uri_config.open()
   }
 
   openFortiAddDialog(): void {
