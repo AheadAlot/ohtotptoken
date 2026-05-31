@@ -5,13 +5,13 @@
         "name": "default",
         "type": "HarmonyOS",
         "material": {
-          "storeFile": "D:/Project/HUAWEI/huawei.p12",
-          "storePassword": "0000001CF1F563172C74E110C8AD8471643BB1C686B1E5783C10597A098D2D846150B4FF3E4C427A87FCC63E",
-          "keyAlias": "debug",
-          "keyPassword": "0000001C031B81384727A04DC1E39FE53B1B936353F3722734D606E55BA784B34444755F31B31FC0EEDD884A",
+          "certpath": "C:\\Users\\evelo\\.ohos\\config\\default_ohtotptoken_V9sJGc5Sthk3VHwBTW8ioyLx7Yr9aJmD60s1yuv5aGw=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001A28FE9E6CC7CC19376378073E66A0AD826FF8C95C33EB7F83E2CEF318CC962B1C8D7C0C718403",
+          "profile": "C:\\Users\\evelo\\.ohos\\config\\default_ohtotptoken_V9sJGc5Sthk3VHwBTW8ioyLx7Yr9aJmD60s1yuv5aGw=.p7b",
           "signAlg": "SHA256withECDSA",
-          "profile": "D:/Project/HUAWEI/github_debugDebug.p7b",
-          "certpath": "D:/Project/HUAWEI/github_debug.cer"
+          "storeFile": "C:\\Users\\evelo\\.ohos\\config\\default_ohtotptoken_V9sJGc5Sthk3VHwBTW8ioyLx7Yr9aJmD60s1yuv5aGw=.p12",
+          "storePassword": "0000001A64DC643C992B600B44339E258E01C77B28C8A9170639EFD34F3FF030173AD8B2D645345E4173"
         }
       }
     ],
