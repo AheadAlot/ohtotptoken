@@ -299,7 +299,6 @@ export struct BackupAndMigrationSheet {
                               }
                             }),
                             autoCancel: true,
-                            alignment: DialogAlignment.Bottom,
                             customStyle: false,
                             cornerRadius: 10,
                           });
