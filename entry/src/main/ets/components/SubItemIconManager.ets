@@ -151,6 +151,9 @@ export struct SubItemIconManager {
         this.rematchCurrent = i + 1;
         this.rematchProgress = Math.round((i + 1) / changed.length * 100);
       }
+    } catch (err) {
+      hilog.error(0, 'SubItemIconManager', 'rematchAndShowProgress failed: ' + JSON.stringify(err));
+      showSnackBar('重新匹配图标失败', SnackBarNotifyType.ERROR);
     } finally {
       setTimeout(() => {
         this.rematchProgress = -1;

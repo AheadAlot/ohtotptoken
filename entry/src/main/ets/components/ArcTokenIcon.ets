@@ -84,7 +84,7 @@ export struct ArcTokenIcon {
       this.icon = this.validateUri(TokenIconPacks.getIconByIssuer(this.issuer));
     }
     this.applyColorFilter = !this.bypassColorFilter &&
-      (typeof this.icon === 'string' && this.icon.startsWith('rawfile://'));
+      (typeof this.icon === 'object');
   }
 
   aboutToAppear(): void {
@@ -92,7 +92,7 @@ export struct ArcTokenIcon {
       this.icon = this.validateUri(TokenIconPacks.getIconByIssuer(this.issuer));
     }
     this.applyColorFilter = !this.bypassColorFilter &&
-      (typeof this.icon === 'string' && this.icon.startsWith('rawfile://'));
+      (typeof this.icon === 'object');
     this.iconPackChangedHandler = () => this.onIconPackChanged();
     this.appCtx.eventHub?.on(EVENT_NAMES.ICON_PACK_CHANGED, this.iconPackChangedHandler);
   }

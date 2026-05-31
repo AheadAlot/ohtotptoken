@@ -403,7 +403,7 @@ export class TokenIconPacks {
         throw new Error('Invalid icon pack JSON');
       }
       const fallbackUuid = `${tmp.name ?? 'pack'}_${path.split('/').pop()}`;
-      const rawUuid = tmp.uuid ?? fallbackUuid;
+      const rawUuid = String(tmp.uuid ?? fallbackUuid);
       pack.uuid = rawUuid.startsWith('__builtin_') ? 'ext_' + rawUuid : rawUuid;
       pack.name = tmp.name ?? 'invalid';
       pack.version = tmp.version ?? 0;
@@ -429,6 +429,9 @@ export class TokenIconPacks {
   }
 
   public static getIconByIssuer(issuer: string): string {
+    if (!issuer) {
+      return '';
+    }
     for (const packId of TokenIconPacks.enabled_packs) {
       if (packId === BUILTIN_DEFAULT_PACK_ID) {
         const icon = TokenIconPacks.default_icon_pack.getIconPathByIssuer(issuer);
