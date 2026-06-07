@@ -15,6 +15,7 @@
 
 # Agent
 .kilo/
+AGENTS.md
 
 # Crash dumps
 *.dmp
