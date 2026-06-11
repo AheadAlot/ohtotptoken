@@ -51,9 +51,11 @@ export struct TokenSortPage {
     HdsNavDestination() {
       Column() {
         List({ space: this.token_preference.app_appearance_item_space, scroller: this.sortListScroller }) {
-          // 顶部避让区域
-          ListItem()
-            .height(CommonConstants.AVOID_TOP_BASE_HEIGHT + this.window.AvoidTopHeight)
+          // 顶部避让区域 — 用 ListItemGroup 确保多 lane 布局中跨整行
+          ListItemGroup() {
+            ListItem()
+              .height(CommonConstants.AVOID_TOP_BASE_HEIGHT + this.window.AvoidTopHeight)
+          }
 
           LazyForEach(this.dataSource, (token: TokenConfig, index: number) => {
             ListItem() {
