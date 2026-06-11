@@ -335,7 +335,7 @@ export enum EXTERNAL_URLS {
   /** 问卷反馈 */
   FEEDBACK_SURVEY = 'https://wj.qq.com/s2/24518107/2b26/',
   /** GitHub反馈 */
-  FEEDBACK_GITHUB = 'https://github.com/SolidFaker/ohtotptoken/issues',
+  FEEDBACK_GITHUB = 'https://github.com/OHOTP/ohtotptoken/issues',
 }
 
 /**
