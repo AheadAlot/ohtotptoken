@@ -25,7 +25,7 @@ export struct TokenCardConfigPage {
     this.maxSelect = this.formName === 'tokenCard_2x2' ? 2 : 1;
 
     const tkStore = TokenStore.getInstance();
-    tkStore.LoadTokenByDataBase().then(() => {
+    tkStore.initTokenStore().then(() => {
       tkStore.getTokens().then((tokens: TokenConfig[]) => {
         this.tokens = tokens;
       });
