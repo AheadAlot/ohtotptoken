@@ -3,7 +3,7 @@
 <img src="docs/images/app_icon.png" width="40"> OTP Token
 </h1>
 
-![GitHub License](https://img.shields.io/github/license/SolidFaker/ohtotptoken) ![GitHub Release](https://img.shields.io/github/v/release/SolidFaker/ohtotptoken) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/SolidFaker/ohtotptoken/build.yaml) ![QQ Group](https://img.shields.io/badge/QQ-1060812974-red)
+![GitHub License](https://img.shields.io/github/license/OHOTP/ohtotptoken) ![GitHub Release](https://img.shields.io/github/v/release/OHOTP/ohtotptoken) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/OHOTP/ohtotptoken/build.yaml) ![QQ Group](https://img.shields.io/badge/QQ-1060812974-red)
 
 
 [简体中文](docs/README_CN.md)
@@ -53,8 +53,8 @@ Open source OTP Authenticator for HarmonyOS NEXT.
 
 ## Contributors
 
-<a href="https://github.com/SolidFaker/ohtotptoken/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=SolidFaker/ohtotptoken" />
+<a href="https://github.com/OHOTP/ohtotptoken/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=OHOTP/ohtotptoken" />
 </a>
 
 Made with [contrib.rocks](https://contrib.rocks).

@@ -21,7 +21,7 @@ export struct AboutSheet {
   aboutToAppear(): void {
     let bundleInfo = AppStorage.get<bundleManager.BundleInfo>("BundleInfo");
     this.str_about_app =
-      "Github: SolidFaker/ohtotptoken\n" +
+      "Github: OHOTP/ohtotptoken\n" +
       "E-mail: enbinli@outlook.com\n" +
       "Contributors: @Solidfaker, @eveloki, @lsxuan12138, @TomStilson, @tomygin, @wulongshe\n" +
       "Bundle Name: " + bundleInfo?.name + "\n" +
