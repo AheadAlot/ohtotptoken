@@ -51,12 +51,6 @@ export struct TokenSortPage {
     HdsNavDestination() {
       Column() {
         List({ space: this.token_preference.app_appearance_item_space, scroller: this.sortListScroller }) {
-          // 顶部避让区域 — 用 ListItemGroup 确保多 lane 布局中跨整行
-          ListItemGroup() {
-            ListItem()
-              .height(CommonConstants.AVOID_TOP_BASE_HEIGHT + this.window.AvoidTopHeight)
-          }
-
           LazyForEach(this.dataSource, (token: TokenConfig, index: number) => {
             ListItem() {
               TokenItem({
@@ -81,12 +75,15 @@ export struct TokenSortPage {
             })
 
         }
+        .clip(false)
         .alignListItem(ListItemAlign.Center)
         .lanes({ minLength: 400, maxLength: this.token_preference.app_appearance_item_max_width })
         .layoutWeight(1)
         .width('100%')
+        .height('100%')
         .scrollBar(BarState.Off)
         .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+        .contentStartOffset(this.window.AvoidTopHeight + CommonConstants.AVOID_TOP_BASE_HEIGHT)
         .contentEndOffset(this.window.AvoidBottomHeight)
       }
       .backgroundColor($r('app.color.window_background'))
@@ -101,24 +98,15 @@ export struct TokenSortPage {
           contentStyle: {
             titleStyle: {
               mainTitleColor: $r('sys.color.font_primary'),
-              subTitleColor: $r('sys.color.font_secondary')
             },
             backIconStyle: {
               iconColor: $r('sys.color.icon_primary')
             }
           },
-          backgroundStyle: {
-            maskExtraHeight: 0
-          }
-        },
-        scrollEffectStyle: {
-          backgroundStyle: {
-            maskExtraHeight: 0
-          }
         },
         scrollEffectOpts: {
           enableScrollEffect: true,
-          scrollEffectType: this.scrollEffectType
+          scrollEffectType: this.scrollEffectType,
         },
         systemMaterialEffect: {
           materialType: hdsMaterial.MaterialType.ADAPTIVE,
