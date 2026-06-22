@@ -344,6 +344,6 @@ export struct TokenSearchPage {
         })
       })
     }
-    .margin({ left: 10 })
+    .margin({ left: 10, right: 10 })
   }
 }

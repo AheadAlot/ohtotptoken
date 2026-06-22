@@ -164,6 +164,7 @@ export struct TokenListPage {
         .scrollBar(BarState.Off)
         .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
         .clip(false)
+        .cachedCount(3, true)
       }
       .alignItems(HorizontalAlign.Center)
     }
@@ -278,6 +279,6 @@ export struct TokenListPage {
         })
       })
     }
-    .margin({ left: 10 })
+    .margin({ left: 10, right: 10 })
   }
 }
