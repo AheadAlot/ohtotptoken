@@ -279,6 +279,6 @@ export struct TokenListPage {
         })
       })
     }
-    .margin({ left: 10, right: 10 })
+    .margin({ left: 10, right: this.token_preference.app_appearance_token_list_item_suffix_padding })
   }
 }
