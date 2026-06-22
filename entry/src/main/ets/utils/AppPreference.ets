@@ -298,8 +298,8 @@ export class TokenPreference {
   @Trace app_appearance_user_name_font_size = 10;
   @Trace app_appearance_user_name_font_weight = 400;
   @Trace app_appearance_item_max_width = 800;
-  @Trace app_appearance_token_list_item_prefix_padding = 10;
-  @Trace app_appearance_token_list_item_suffix_padding = 10;
+  @Trace app_appearance_token_list_item_prefix_padding = 16;
+  @Trace app_appearance_token_list_item_suffix_padding = 16;
   @Trace app_appearance_chain_animation_enable = true;
   @Trace app_appearance_long_press_duration = 300;
 }
@@ -419,8 +419,8 @@ export class AppPreference {
     [PREF_KEYS.APPEARANCE_USER_NAME_FONT_SIZE, 10],
     [PREF_KEYS.APPEARANCE_USER_NAME_FONT_WEIGHT, 400],
     [PREF_KEYS.APPEARANCE_ITEM_MAX_WIDTH, 800],
-    [PREF_KEYS.APPEARANCE_TOKEN_LIST_ITEM_PREFIX_PADDING, 10],
-    [PREF_KEYS.APPEARANCE_TOKEN_LIST_ITEM_SUFFIX_PADDING, 10],
+    [PREF_KEYS.APPEARANCE_TOKEN_LIST_ITEM_PREFIX_PADDING, 16],
+    [PREF_KEYS.APPEARANCE_TOKEN_LIST_ITEM_SUFFIX_PADDING, 16],
     [PREF_KEYS.APPEARANCE_CHAIN_ANIMATION_ENABLE, true],
     [PREF_KEYS.APPEARANCE_LONG_PRESS_DURATION, 300],
     // 外观-顶部模糊类型
