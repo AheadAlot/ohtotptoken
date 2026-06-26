@@ -1222,7 +1222,7 @@
     },
     {
       "name": "setting_dlp_anti_peep_des",
-      "value": "检测到他人窥视时自动遮盖令牌内容"
+      "value": "檢測到他人窺視時自動遮蓋令牌內容。"
     },
     {
       "name": "setting_dlp_anti_peep_unsupported",

@@ -153,6 +153,7 @@ export struct ArcTokenListPage {
       .onClick(async () => {
         this.getUIContext().showAlertDialog({
           title: $r('app.string.alert_remove_title', conf.TokenIssuer),
+          subtitle: conf.TokenName,
           message: $r('app.string.alert_remove_confirm_msg'),
           autoCancel: true,
           alignment: DialogAlignment.Center,

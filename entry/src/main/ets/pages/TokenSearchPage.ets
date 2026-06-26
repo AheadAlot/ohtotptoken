@@ -325,6 +325,7 @@ export struct TokenSearchPage {
       .onClick(async () => {
         AlertDialog.show({
           title: $r('app.string.alert_remove_title', vm.config.TokenIssuer),
+          subtitle: vm.config.TokenName,
           message: $r('app.string.alert_remove_confirm_msg'),
           autoCancel: true,
           alignment: DialogAlignment.Center,

@@ -414,6 +414,7 @@ export struct TokenItem {
         .onClick(() => {
           this.getUIContext().showAlertDialog({
             title: $r('app.string.alert_remove_title', this.Config.TokenIssuer),
+            subtitle: this.Config.TokenName,
             message: $r('app.string.alert_remove_confirm_msg'),
             autoCancel: true,
             alignment: DialogAlignment.Center,
