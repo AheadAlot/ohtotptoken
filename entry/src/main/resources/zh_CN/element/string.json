@@ -49,8 +49,12 @@
       "value": "设置"
     },
     {
+      "name": "alert_remove_title",
+      "value": "删除令牌 %s"
+    },
+    {
       "name": "alert_remove_confirm_msg",
-      "value": "确认删除%s的令牌吗?"
+      "value": "此操作无法撤销。"
     },
     {
       "name": "dialog_btn_confirm",
@@ -59,6 +63,10 @@
     {
       "name": "dialog_btn_cancel",
       "value": "取消"
+    },
+    {
+      "name": "dialog_btn_delete",
+      "value": "删除"
     },
     {
       "name": "dialog_cfg_tk_secret",

@@ -152,7 +152,8 @@ export struct ArcTokenListPage {
       .padding(10)
       .onClick(async () => {
         this.getUIContext().showAlertDialog({
-          message: $r('app.string.alert_remove_confirm_msg', conf.TokenName),
+          title: $r('app.string.alert_remove_title', conf.TokenIssuer),
+          message: $r('app.string.alert_remove_confirm_msg'),
           autoCancel: true,
           alignment: DialogAlignment.Center,
           primaryButton: {
@@ -163,7 +164,7 @@ export struct ArcTokenListPage {
             }
           },
           secondaryButton: {
-            value: $r('app.string.dialog_btn_confirm'),
+            value: $r('app.string.dialog_btn_delete'),
             fontColor: Color.Red,
             action: async () => {
               tkStore.deleteToken(conf.TokenUUID);

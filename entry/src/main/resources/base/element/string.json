@@ -49,8 +49,12 @@
       "value": "Settings"
     },
     {
+      "name": "alert_remove_title",
+      "value": "Delete token %s"
+    },
+    {
       "name": "alert_remove_confirm_msg",
-      "value": "Confirm to remove token for %s?"
+      "value": "This action cannot be undone."
     },
     {
       "name": "dialog_btn_confirm",
@@ -59,6 +63,10 @@
     {
       "name": "dialog_btn_cancel",
       "value": "Cancel"
+    },
+    {
+      "name": "dialog_btn_delete",
+      "value": "Delete"
     },
     {
       "name": "dialog_cfg_tk_secret",

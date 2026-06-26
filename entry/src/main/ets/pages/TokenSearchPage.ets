@@ -324,7 +324,8 @@ export struct TokenSearchPage {
       .padding(10)
       .onClick(async () => {
         AlertDialog.show({
-          message: $r('app.string.alert_remove_confirm_msg', vm.config.TokenName),
+          title: $r('app.string.alert_remove_title', vm.config.TokenIssuer),
+          message: $r('app.string.alert_remove_confirm_msg'),
           autoCancel: true,
           alignment: DialogAlignment.Center,
           primaryButton: {
@@ -335,7 +336,7 @@ export struct TokenSearchPage {
             }
           },
           secondaryButton: {
-            value: $r('app.string.dialog_btn_confirm'),
+            value: $r('app.string.dialog_btn_delete'),
             fontColor: Color.Red,
             action: async () => {
               tkStore.deleteToken(vm.config.TokenUUID);
