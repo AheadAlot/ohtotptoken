@@ -5,7 +5,7 @@ import {
   ApplicationStateChangeCallback,
   ConfigurationConstant,
 } from '@kit.AbilityKit';
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { hilog, hiTraceMeter } from '@kit.PerformanceAnalysisKit';
 import { AppStorageV2, window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { AppPreference, SettingColorMode, PREF_KEYS, EVENT_NAMES } from '../utils/AppPreference';
@@ -128,21 +128,33 @@ export default class EntryAbility extends UIAbility {
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onDestroy');
   }
 
-  onWindowStageCreate(windowStage: window.WindowStage): void {
-    // Main window is created, set main page for this ability
-    let win: AppWindowInfo = AppStorageV2.connect(AppWindowInfo, () => new AppWindowInfo())!;
+  // [性能打点] onWindowStageCreate 整体耗时 + loadSettings/loadContent 子阶段耗时
+  async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
+    try {
+      // 异步打点：覆盖 onWindowStageCreate 入口到 loadContent 回调完成
+      hiTraceMeter.startTrace('H:onWindowStageCreate', 1);
+      let win: AppWindowInfo = AppStorageV2.connect(AppWindowInfo, () => new AppWindowInfo())!;
 
-    win.ColorMode = this.context.config.colorMode ?? -1;
-    win.Context = this.context;
+      win.ColorMode = this.context.config.colorMode ?? -1;
+      win.Context = this.context;
 
-    hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
-    AppPreference.loadSettings().then(() => {
+      hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
+
+      hiTraceMeter.startTrace('H:onWindowStageCreate.loadSettings', 1);
+      await AppPreference.loadSettings();
+      hiTraceMeter.finishTrace('H:onWindowStageCreate.loadSettings', 1);
+
       if (AppPreference.getPreference(PREF_KEYS.SAFETY_LOCK_ENABLE)) {
         AppStorage.setOrCreate('app_lock_need_show', true);
       }
+
+      // 异步打点：loadContent 触发 Index 页面构建，回调中完成窗口初始化
+      hiTraceMeter.startTrace('H:onWindowStageCreate.loadContent', 1);
       windowStage.loadContent('pages/Index', (err) => {
+        hiTraceMeter.finishTrace('H:onWindowStageCreate.loadContent', 1);
         if (err.code) {
           hilog.error(0x0000, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
+          hiTraceMeter.finishTrace('H:onWindowStageCreate', 1);
           return;
         }
 
@@ -157,7 +169,6 @@ export default class EntryAbility extends UIAbility {
         const avoidAreaTop = windowClass.getWindowAvoidArea(window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR);
         const avoidAreaBottom = windowClass.getWindowAvoidArea(window.AvoidAreaType.TYPE_SYSTEM);
 
-        // save window avoid area info
         win.AvoidTopHeight = this.uiContext.px2vp(avoidAreaBottom.topRect.height);
         win.AvoidBottomHeight = this.uiContext.px2vp(avoidAreaTop.bottomRect.height);
 
@@ -174,17 +185,21 @@ export default class EntryAbility extends UIAbility {
         win.WidthBreakpoint = widthBp;
         win.HeightBreakpoint = heightBp;
         windowClass.on('windowSizeChange', this.onWindowSizeChange);
-        // apply app settings
+
         this.applySettings(windowClass);
 
-        // 初始化防窥保护
         if (AppPreference.getPreference(PREF_KEYS.SAFETY_DLP_ANTI_PEEP_ENABLE)) {
           DlpAntiPeepManager.getInstance().start(windowClass, this.context);
         }
 
+        hiTraceMeter.finishTrace('H:onWindowStageCreate', 1);
         hilog.info(0x0000, 'testTag', 'Succeeded in loading the content.');
       });
-    });
+    }
+    catch (err) {
+      hilog.error(0x0000, 'onWindowStageCreate', `${err}`);
+    }
+
   }
 
   onWindowStageRestore(windowStage: window.WindowStage): void {

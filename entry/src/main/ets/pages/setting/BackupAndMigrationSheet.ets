@@ -18,7 +18,8 @@ import { ShowCloudSyncDetailsPage } from '../ShowCloudSyncDetailsPage';
 import { ShowCloudBackupHistoryPage } from '../ShowCloudBackupHistoryPage';
 import { HuaweiAccountManager } from '../../utils/HuaweiAccountManager';
 import { hdsMaterial, HdsNavigation, HdsNavigationTitleMode, ScrollEffectType } from '@kit.UIDesignKit';
-import { CommonConstants } from '../../utils/CommonConstants';
+import { TokenImporterRegistry, TokenImporter } from '../../utils/importers/TokenImporter';
+import { URIConfigDialog } from '../../dialogs/URIConfigDialog';
 
 @Preview
 @ComponentV2
@@ -31,18 +32,25 @@ export struct BackupAndMigrationSheet {
   @Local versionCode?: number;
   @Local cloudBackupEnabled: boolean = false;
   @Local isHuaweiLoggedIn: boolean = false;
+  @Local importers: TokenImporter[] = [];
   private sheetScroller: Scroller = new Scroller();
 
   //备份时是否为导出模式
   private backup_is_input: boolean = true;
   private backup_select_uri: string = '';
   private appCtx = AppStorage.get<common.UIAbilityContext>('appContext') as common.UIAbilityContext;
+  // URI 导入对话框控制器（组件内持有，避免非组件上下文问题）
+  private uriDialogController: CustomDialogController | null = null;
 
   aboutToAppear(): void {
     let bundleInfo = AppStorage.get<bundleManager.BundleInfo>("BundleInfo");
     this.versionCode = bundleInfo?.versionCode;
     this.cloudBackupEnabled = AppPreference.getPreference(PREF_KEYS.APPEARANCE_HUAWEI_CLOUD_SYNC_ENABLE) as boolean;
     this.isHuaweiLoggedIn = HuaweiAccountManager.getInstance().userLogin;
+    // 初始化导入器注册表
+    const registry = TokenImporterRegistry.getInstance();
+    registry.init();
+    this.importers = registry.getAll();
   }
 
   //region 加密导入导出
@@ -223,6 +231,7 @@ export struct BackupAndMigrationSheet {
   // 在自定义组件即将析构销毁时将dialogController置空
   aboutToDisappear() {
     this.password_input_dialog = null // 将dialogController置空
+    this.uriDialogController = null
   }
 
   build() {
@@ -230,11 +239,8 @@ export struct BackupAndMigrationSheet {
       HdsNavigation(this.pageInfos) {
         Column({ space: LengthMetrics.vp(12).value }) {
           List({ scroller: this.sheetScroller, space: 10 }) {
-            ListItem()
-              .height(CommonConstants.AVOID_TOP_BASE_HEIGHT)
-
             ListItem() {
-              SettingItem({ title: "" }) {
+              SettingItem({ title: $r('app.string.setting_backup') }) {
                 SubItemButton({
                   symbol: $r('sys.symbol.save'),
                   text: $r('app.string.setting_backup_export')
@@ -268,8 +274,51 @@ export struct BackupAndMigrationSheet {
             }
             .padding({ left: 10, right: 10 })
 
+            // 从其他验证器导入
+            if (this.importers.length > 0) {
+              ListItem() {
+                SettingItem({ title: $r('app.string.setting_import_from_other_apps') }) {
+                  ForEach(this.importers, (importer: TokenImporter, index: number) => {
+                    if (index > 0) {
+                      SubItemDivider()
+                    }
+                    SubItemButton({
+                      symbol: importer.icon,
+                      text: importer.name,
+                      description: importer.description
+                    })
+                      .onClick(() => {
+                        if (importer.id === 'uri') {
+                          // URI 导入需要组件上下文，在此创建 CustomDialogController
+                          if (!this.uriDialogController) {
+                            this.uriDialogController = new CustomDialogController({
+                              builder: URIConfigDialog({
+                                confirm: async (tokens: Array<TokenConfig>): Promise<boolean> => {
+                                  this.backupReload(tokens);
+                                  return true;
+                                }
+                              }),
+                              autoCancel: true,
+                              customStyle: false,
+                              cornerRadius: 10,
+                            });
+                          }
+                          this.uriDialogController.open();
+                        } else {
+                          // 其他导入器（如 TwoFAImporter）使用各自的 import() 方法
+                          importer.import(this.getUIContext(), (tokens: Array<TokenConfig>) => {
+                            this.backupReload(tokens);
+                          });
+                        }
+                      })
+                  }, (importer: TokenImporter) => importer.id)
+                }
+              }
+              .padding({ left: 10, right: 10 })
+            }
+
             ListItem() {
-              SettingItem({ title: "" }) {
+              SettingItem({ title: $r('app.string.data_rdb_cloud_sync') }) {
                 SubItemToggle({
                   icon: $r('sys.symbol.icloud'),
                   title: $r('app.string.data_rdb_cloud_sync'),
@@ -311,7 +360,9 @@ export struct BackupAndMigrationSheet {
             }
             .padding({ left: 10, right: 10 })
           }
+          .clip(false)
           .width('100%')
+          .height('100%')
           .layoutWeight(1)
           .scrollBar(BarState.Off)
           .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
@@ -329,6 +380,7 @@ export struct BackupAndMigrationSheet {
       .bindToScrollable([this.sheetScroller])
       .titleMode(HdsNavigationTitleMode.MODAL)
       .titleBar({
+        enableComponentSafeArea: true,
         style: {
           originalStyle: {
             contentStyle: {
@@ -340,14 +392,6 @@ export struct BackupAndMigrationSheet {
                 iconColor: $r('sys.color.icon_primary')
               }
             },
-            backgroundStyle: {
-              maskExtraHeight: 0
-            }
-          },
-          scrollEffectStyle: {
-            backgroundStyle: {
-              maskExtraHeight: 0
-            }
           },
           scrollEffectOpts: {
             enableScrollEffect: true,

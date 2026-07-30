@@ -24,7 +24,6 @@ export class PreferenceManager {
   private static instance: PreferenceManager;
 
   private constructor() {
-    this.initPreference(PREFERENCES_NAME);
   }
 
   public static getInstance(): PreferenceManager {
@@ -32,6 +31,15 @@ export class PreferenceManager {
       PreferenceManager.instance = new PreferenceManager();
     }
     return PreferenceManager.instance;
+  }
+
+  async ensureInitialized(): Promise<void> {
+    if (!this.preferences) {
+      const ctx = AppStorage.get<common.UIAbilityContext>('appContext');
+      if (ctx) {
+        this.preferences = await preferences.getPreferences(ctx, PREFERENCES_NAME);
+      }
+    }
   }
 
   async initPreference(storeName: string): Promise<void> {
@@ -76,6 +84,13 @@ export class PreferenceManager {
       return null;
     }
     return JSON.parse(res as string) as T;
+  }
+
+  getAllValues(): Record<string, preferences.ValueType> {
+    if (!this.preferences) {
+      return {} as Record<string, preferences.ValueType>;
+    }
+    return this.preferences.getAllSync() as Record<string, preferences.ValueType>;
   }
 
   async hasValue(key: string): Promise<boolean> {

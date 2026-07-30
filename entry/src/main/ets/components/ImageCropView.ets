@@ -1,5 +1,4 @@
 import { image } from '@kit.ImageKit';
-import common2D from '@ohos.graphics.common2D';
 import Matrix4 from '@ohos.matrix4';
 import { fileIo } from '@kit.CoreFileKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';

@@ -28,21 +28,54 @@ export struct AppearancePage {
   // 使用 AppStorage 获取 context，避免在字段初始化阶段调用 getUIContext()（此时 build() 尚未执行）
   private context: common.UIAbilityContext = AppStorage.get('appContext') as common.UIAbilityContext;
   private scroller: Scroller = new Scroller();
+
+  // [性能优化] 本页不再无条件自建 1s 计时器。
+  // 首页 Index 持有全局唯一时间计时器，每秒经 eventHub 广播 TIMESTAMP_CHANGED，
+  // 预览区内的 TokenItem 自身已订阅该事件，正常情况下可直接复用、无需重复推送。
+  //
+  // [防御性兜底] 为避免对“Index 必然挂载且其计时器必然在跑”这一隐式假设产生硬依赖
+  // （例如未来路由调整使本页在 Index 之外打开），这里订阅 TIMESTAMP_CHANGED 来探测全局心跳：
+  //   - 收到事件 → 记录最近心跳时间，说明全局源健康，本页不做任何额外推送；
+  //   - 超过阈值仍无心跳 → 全局源疑似缺失，本页启动兜底计时器自行广播，保证预览倒计时持续刷新。
+  // 健康路径下兜底计时器虽每秒触发一次，但不产生 emit（不触发 TokenItem 重复计算 HMAC），开销可忽略。
   private timestampIntervalId: number = -1;
+  private lastTimestampTick: number = 0;
+  // 标记“正在由本页兜底广播”，避免自身 emit 同步回调时误刷新心跳。
+  private selfEmitting: boolean = false;
+  private onTimestampHandler: () => void = () => {};
+  // 判定全局心跳缺失的阈值（毫秒）。全局计时器为 1s 一次，取 1.5s 留出抖动余量。
+  private static readonly HEARTBEAT_TIMEOUT_MS: number = 1500;
 
   aboutToAppear(): void {
+    this.lastTimestampTick = systemDateTime.getTime();
+    // 仅用于探测全局心跳：仅当事件来源为“全局 Index”（非本页兜底）时才刷新心跳时间。
+    // 若不区分来源，本页兜底广播会经 eventHub 同步回调自身，把心跳刷新为当前时间，
+    // 导致兜底计时器每 2s 才触发一次（出现卡顿）。
+    this.onTimestampHandler = (): void => {
+      if (!this.selfEmitting) {
+        this.lastTimestampTick = systemDateTime.getTime();
+      }
+    };
+    this.context.eventHub?.on(EVENT_NAMES.TIMESTAMP_CHANGED, this.onTimestampHandler);
+
+    // 兜底计时器：仅在全局心跳超时时才广播，避免与 Index 重复推送。
+    // eventHub.emit 为同步调用，故用 selfEmitting 标志包裹以阻止自身回调污染心跳，
+    // 保证全局心跳缺失时兜底能稳定每 1s 广播一次。
     this.timestampIntervalId = setInterval(() => {
-      const timestamp = Math.floor(systemDateTime.getTime() / 1000);
-      if (this.context.eventHub != undefined) {
-        this.context.eventHub.emit(EVENT_NAMES.TIMESTAMP_CHANGED, timestamp, false);
+      if (systemDateTime.getTime() - this.lastTimestampTick > AppearancePage.HEARTBEAT_TIMEOUT_MS) {
+        const timestamp = Math.floor(systemDateTime.getTime() / 1000);
+        this.selfEmitting = true;
+        this.context.eventHub?.emit(EVENT_NAMES.TIMESTAMP_CHANGED, timestamp, false);
+        this.selfEmitting = false;
       }
     }, 1000);
   }
 
-  // 清理 setInterval，防止页面弹出后计时器持续泄漏
   aboutToDisappear(): void {
+    this.context.eventHub?.off(EVENT_NAMES.TIMESTAMP_CHANGED, this.onTimestampHandler);
     if (this.timestampIntervalId !== -1) {
       clearInterval(this.timestampIntervalId);
+      this.timestampIntervalId = -1;
     }
   }
 
@@ -59,16 +92,14 @@ export struct AppearancePage {
               ListItem() {
                 TokenItem({
                   Config: new TokenConfig('ABC', otpType.TOTP, 'Github', 'Foo Bar'),
-                  Update: () => {
-                  }
+                  Update: async (): Promise<boolean> => false
                 })
               }
 
               ListItem() {
                 TokenItem({
                   Config: new TokenConfig('ABC', otpType.HOTP, 'Microsoft', 'Some Body'),
-                  Update: () => {
-                  }
+                  Update: async (): Promise<boolean> => false
                 })
               }
             }
@@ -143,6 +174,13 @@ export struct AppearancePage {
                   title: $r('app.string.token_item_function_slider'),
                   items: [
                     {
+                      name: $r('app.string.appearance_long_press_duration'),
+                      default: this.token_preference.app_appearance_long_press_duration,
+                      min: 200,
+                      max: 1000,
+                      step: 50
+                    },
+                    {
                       name: $r('app.string.token_item_color_change_threshold'),
                       default: this.token_preference.app_appearance_token_counter_next_margin,
                       min: 0,
@@ -154,6 +192,11 @@ export struct AppearancePage {
                   onChange: (index, value) => {
                     switch (index) {
                       case 0: {
+                        AppPreference.setPreference(PREF_KEYS.APPEARANCE_LONG_PRESS_DURATION, value);
+                        this.token_preference.app_appearance_long_press_duration = value;
+                        break;
+                      }
+                      case 1: {
                         AppPreference.setPreference(PREF_KEYS.APPEARANCE_TOKEN_COUNTER_NEXT_MARGIN, value);
                         this.token_preference.app_appearance_token_counter_next_margin = value;
                         break;
@@ -550,14 +593,6 @@ export struct AppearancePage {
               iconColor: $r('sys.color.icon_primary')
             }
           },
-          backgroundStyle: {
-            maskExtraHeight: 0
-          }
-        },
-        scrollEffectStyle: {
-          backgroundStyle: {
-            maskExtraHeight: 0
-          }
         },
         scrollEffectOpts: {
           enableScrollEffect: true,

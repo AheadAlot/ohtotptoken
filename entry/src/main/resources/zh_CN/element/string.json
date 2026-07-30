@@ -49,8 +49,12 @@
       "value": "设置"
     },
     {
+      "name": "alert_remove_title",
+      "value": "删除令牌 %s"
+    },
+    {
       "name": "alert_remove_confirm_msg",
-      "value": "确认删除%s的令牌吗?"
+      "value": "此操作无法撤销。"
     },
     {
       "name": "dialog_btn_confirm",
@@ -59,6 +63,10 @@
     {
       "name": "dialog_btn_cancel",
       "value": "取消"
+    },
+    {
+      "name": "dialog_btn_delete",
+      "value": "删除"
     },
     {
       "name": "dialog_cfg_tk_secret",
@@ -226,7 +234,7 @@
     },
     {
       "name": "data_rdb_sync_des",
-      "value": "数据将会同步到一个组网环境中您华为账户登录的其他设备。"
+      "value": "数据将会同步到一个组网环境中您华为账户登录的其他设备。仅同步令牌数据，不同步图标包和偏好设置。"
     },
     {
       "name": "data_rdb_cloud_sync",
@@ -234,7 +242,7 @@
     },
     {
       "name": "data_rdb_cloud_sync_des",
-      "value": "将应用数据备份至华为云，数据将安全存储在华为云端。"
+      "value": "将令牌和图标包数据备份至华为云，数据将安全存储在华为云端。"
     },
     {
       "name": "data_rdb_sync_details",
@@ -397,15 +405,19 @@
       "value": "更新时间"
     },
     {
-      "name": "data_kv_archive_time",
-      "value": "存档时间"
+      "name": "data_kv_sync_manual",
+      "value": "立即同步"
     },
     {
-      "name": "data_sync_manual",
+      "name": "data_kv_sync_manual_des",
+      "value": "同步当前所有令牌到其他设备（不含图标包）"
+    },
+    {
+      "name": "cloud_backup_manual",
       "value": "立即备份"
     },
     {
-      "name": "data_sync_manual_des",
+      "name": "cloud_backup_manual_des",
       "value": "将当前所有令牌备份到华为云"
     },
     {
@@ -527,6 +539,10 @@
     {
       "name": "setting_add_icon_pack",
       "value": "添加图标包"
+    },
+    {
+      "name": "setting_icon_pack_edit",
+      "value": "编辑"
     },
     {
       "name": "alert_icon_pack_remove_confirm_msg",
@@ -685,6 +701,14 @@
       "value": "开启列表项的错落入场动画效果。"
     },
     {
+      "name": "appearance_long_press_duration",
+      "value": "长按菜单触发时长"
+    },
+    {
+      "name": "appearance_long_press_duration_des",
+      "value": "控制长按Token项弹出菜单的等待时间，范围200-1000毫秒。"
+    },
+    {
       "name": "token_item_slider",
       "value": "尺寸与布局"
     },
@@ -791,6 +815,14 @@
     {
       "name": "token_right_menu_copy",
       "value": "复制"
+    },
+    {
+      "name": "token_right_menu_sort",
+      "value": "排序"
+    },
+    {
+      "name": "token_sort_page_title",
+      "value": "排序"
     },
     {
       "name": "token_item_max_width",
@@ -1190,11 +1222,107 @@
     },
     {
       "name": "setting_dlp_anti_peep_des",
-      "value": "检测到他人窥视时自动遮盖令牌内容"
+      "value": "检测到他人窥视时自动遮盖令牌内容。"
     },
     {
       "name": "setting_dlp_anti_peep_unsupported",
       "value": "您的设备不支持防窥保护功能"
+    },
+    {
+      "name": "dialog_icon_search_placeholder",
+      "value": "搜索图标..."
+    },
+    {
+      "name": "dialog_icon_empty",
+      "value": "无匹配图标"
+    },
+    {
+      "name": "setting_import_from_other_apps",
+      "value": "从其他验证器导入"
+    },
+    {
+      "name": "importer_twofa_name",
+      "value": "2FA验证器"
+    },
+    {
+      "name": "importer_twofa_desc",
+      "value": "导入 .json 备份文件（不含密码）"
+    },
+    {
+      "name": "importer_twofa_invalid_file",
+      "value": "文件格式不正确"
+    },
+    {
+      "name": "importer_twofa_empty",
+      "value": "文件中没有令牌数据"
+    },
+    {
+      "name": "importer_twofa_decode_failed",
+      "value": "文件解析失败"
+    },
+    {
+      "name": "importer_twofa_encrypted_unsupported",
+      "value": "暂不支持加密备份文件"
+    },
+    {
+      "name": "importer_uri_name",
+      "value": "粘贴URI链接"
+    },
+    {
+      "name": "importer_uri_desc",
+      "value": "粘贴 otpauth:// 链接导入令牌"
+    },
+    {
+      "name": "icon_pack_cloud_backup_hint",
+      "value": "图标包设置随华为云备份自动同步至您的所有设备。详见「备份与迁移 > 华为云备份」。"
+    },
+    {
+      "name": "cloud_sync_icon_pack_title",
+      "value": "图标包备份"
+    },
+    {
+      "name": "cloud_sync_icon_pack_status",
+      "value": "备份状态"
+    },
+    {
+      "name": "cloud_sync_icon_pack_status_done_suffix",
+      "value": "个图标包已备份 "
+    },
+    {
+      "name": "cloud_sync_icon_pack_status_none",
+      "value": "未备份"
+    },
+    {
+      "name": "cloud_sync_icon_pack_status_empty",
+      "value": "无图标包"
+    },
+    {
+      "name": "cloud_sync_icon_pack_last_time",
+      "value": "上次备份"
+    },
+    {
+      "name": "cloud_sync_icon_pack_source_device",
+      "value": "来源设备"
+    },
+    {
+      "name": "cloud_sync_icon_pack_hint",
+      "value": "图标包文件和启用设置随令牌一起备份到华为云，恢复时自动还原至所有设备。"
+    },
+    {
+      "name": "cloud_sync_icon_pack_state_backing_up",
+      "value": "正在备份..."
+    },
+    {
+      "name": "cloud_sync_icon_pack_state_restoring",
+      "value": "正在恢复..."
+    },
+    {
+      "name": "cloud_sync_icon_pack_state_clearing",
+      "value": "正在清理..."
+    },
+    {
+      "name": "cloud_sync_icon_pack_state_checking",
+      "value": "正在检查..."
     }
   ]
 }

@@ -12,3 +12,18 @@
 /.appanalyzer
 /.bitfun
 /.playwright-mcp/
+
+# Agent
+.kilo/
+AGENTS.md
+
+# Crash dumps
+*.dmp
+
+# Agent Wiki
+/wiki/
+/raw/
+/schemas/
+/.agent-wiki.yaml
+/.agent-wiki/
+/.lint-cache.json

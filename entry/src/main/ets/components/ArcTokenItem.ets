@@ -11,6 +11,7 @@ import { QRCodeDialog } from '../dialogs/QRCodeDialog';
 import { AppWindowInfo } from '../entryability/EntryAbility';
 import { TokenStore } from '../utils/TokenStore';
 import { ConfigurationConstant, common } from '@kit.AbilityKit';
+import { AppFonts } from '../utils/AppFonts';
 import { ArcTokenIcon } from './ArcTokenIcon';
 
 let current_token_hide_map: Map<string, boolean> = new Map();
@@ -20,7 +21,7 @@ let tkStore = TokenStore.getInstance();
 @ComponentV2
 export struct ArcTokenItem {
   @Require @Param Config: TokenConfig = new TokenConfig();
-  @Event Update: (conf: TokenConfig) => void = () => {};
+  @Event Update: (conf: TokenConfig) => Promise<boolean> = async () => false;
 
   @Local token_preference: TokenPreference = AppStorageV2.connect(TokenPreference) as TokenPreference;
   @Local window: AppWindowInfo = AppStorageV2.connect(AppWindowInfo) as AppWindowInfo;
@@ -217,6 +218,7 @@ export struct ArcTokenItem {
             .fontColor('#ffe0e0e0')
             .fontSize(this.token_preference.app_appearance_token_font_size)
             .fontWeight(this.token_preference.app_appearance_token_font_weight)
+            .fontFamily(AppFonts.CODE_FONT)
             .gesture(
               LongPressGesture()
                 .onAction(() => {
@@ -237,6 +239,7 @@ export struct ArcTokenItem {
               .maxLines(1)
               .fontColor($r('app.color.str_gray'))
               .fontSize(10)
+              .fontFamily(AppFonts.CODE_FONT)
           }
         }
         .onClick(() => {
@@ -308,8 +311,8 @@ export struct ArcTokenItem {
             this.dialog_totp_config = new CustomDialogController({
               builder: TOTPConfigDialog({
                 conf_json: JSON.stringify(this.Config),
-                confirm: (new_conf) => {
-                  this.Update(JSON.parse(new_conf))
+                confirm: async (new_conf): Promise<boolean> => {
+                  return await this.Update(JSON.parse(new_conf))
                 }
               })
             })
@@ -318,8 +321,8 @@ export struct ArcTokenItem {
             this.dialog_forti_config = new CustomDialogController({
               builder: FortiConfigDialog({
                 conf_json: JSON.stringify(this.Config),
-                confirm: (new_conf) => {
-                  this.Update(JSON.parse(new_conf))
+                confirm: async (new_conf): Promise<boolean> => {
+                  return await this.Update(JSON.parse(new_conf))
                 }
               })
             })
@@ -328,8 +331,8 @@ export struct ArcTokenItem {
             this.dialog_steam_config = new CustomDialogController({
               builder: SteamConfigDialog({
                 conf_json: JSON.stringify(this.Config),
-                confirm: (new_conf) => {
-                  this.Update(JSON.parse(new_conf))
+                confirm: async (new_conf): Promise<boolean> => {
+                  return await this.Update(JSON.parse(new_conf))
                 }
               })
             })
@@ -340,7 +343,9 @@ export struct ArcTokenItem {
       MenuItem({ symbolStartIcon: this.menu_icon_trash, content: $r('app.string.token_right_menu_delete') })
         .onClick(() => {
           this.getUIContext().showAlertDialog({
-            message: $r('app.string.alert_remove_confirm_msg', this.Config.TokenName),
+            title: $r('app.string.alert_remove_title', this.Config.TokenIssuer),
+            subtitle: this.Config.TokenName,
+            message: $r('app.string.alert_remove_confirm_msg'),
             autoCancel: true,
             alignment: DialogAlignment.Center,
             primaryButton: {
@@ -351,7 +356,7 @@ export struct ArcTokenItem {
               }
             },
             secondaryButton: {
-              value: $r('app.string.dialog_btn_confirm'),
+              value: $r('app.string.dialog_btn_delete'),
               fontColor: Color.Red,
               action: async () => {
                 tkStore.deleteToken(this.Config.TokenUUID);

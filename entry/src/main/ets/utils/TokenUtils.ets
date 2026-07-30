@@ -7,7 +7,7 @@ import { pasteboard } from '@kit.BasicServicesKit';
 import { fileIo as fs } from '@kit.CoreFileKit';
 import { readFileContent } from './FileUtils';
 import { fileIo } from '@kit.CoreFileKit';
-import { AppPreference, PREF_KEYS } from './AppPreference';
+import { AppPreference, EVENT_NAMES, BUILTIN_DEFAULT_PACK_ID } from './AppPreference';
 import { showSnackBar, SnackBarNotifyType } from './HdsSnackBarUtils';
 
 const RFC4648 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
@@ -366,7 +366,17 @@ export class TokenIconPacks {
   public static default_icon_pack: OTPDefaultIconPack = new OTPDefaultIconPack();
   public static aegis_icon_packs: AegisIconPack[] = [];
   public static user_added_icon_packs: UserAddedIconPack = new UserAddedIconPack();
-  public static selected_icon_pack: number = AppPreference.getPreference(PREF_KEYS.APPEARANCE_ICON_PACK_SELECTED) as number ?? 0;
+  public static enabled_packs: string[] = [BUILTIN_DEFAULT_PACK_ID];
+  private static packByUuid: Map<string, AegisIconPack> = new Map();
+
+  private static rebuildPackMap(): void {
+    TokenIconPacks.packByUuid.clear();
+    for (const pack of TokenIconPacks.aegis_icon_packs) {
+      if (pack.uuid) {
+        TokenIconPacks.packByUuid.set(pack.uuid, pack);
+      }
+    }
+  }
 
   public static async addUserIconPack(path: string): Promise<void> {
     TokenIconPacks.user_added_icon_packs.initIconPack(path);
@@ -375,49 +385,95 @@ export class TokenIconPacks {
   public static async addAegisIconPack(path: string): Promise<void> {
     const icon_path_json = path + "/pack.json";
     if (!fileIo.accessSync(icon_path_json)) {
-      // Display invalid icon pack directories
-      // showSnackBar($r('app.string.toast_icon_pack_invalid'), SnackBarNotifyType.WARNING);
-      // return Promise.reject(new Error("invalid aegis icon pack"));
       let pack: AegisIconPack = new AegisIconPack();
       pack.invalid = true;
       pack.on_device_path = path;
       TokenIconPacks.aegis_icon_packs.push(pack);
+      TokenIconPacks.rebuildPackMap();
       return;
     }
-    if (TokenIconPacks.aegis_icon_packs.filter(pack => pack.on_device_path === path).length > 0) {
+    if (TokenIconPacks.aegis_icon_packs.some(pack => pack.on_device_path === path)) {
       showSnackBar($r('app.string.toast_icon_pack_already_installed'), SnackBarNotifyType.WARNING);
       return;
     }
     return readFileContent(icon_path_json).then((val) => {
       let pack: AegisIconPack = new AegisIconPack();
       const tmp = JSON.parse(val) as AegisIconPack;
-      pack.uuid = tmp.uuid;
+      if (!tmp || !tmp.name) {
+        throw new Error('Invalid icon pack JSON');
+      }
+      const fallbackUuid = `${tmp.name ?? 'pack'}_${path.split('/').pop()}`;
+      const rawUuid = String(tmp.uuid ?? fallbackUuid);
+      pack.uuid = rawUuid.startsWith('__builtin_') ? 'ext_' + rawUuid : rawUuid;
       pack.name = tmp.name ?? 'invalid';
       pack.version = tmp.version ?? 0;
       pack.icons = tmp.icons ?? [];
       pack.on_device_path = path;
       pack.buildUpHashMap();
       TokenIconPacks.aegis_icon_packs.push(pack);
+      TokenIconPacks.rebuildPackMap();
     })
   }
 
   public static async removeAegisIconPack(icon_pack: AegisIconPack): Promise<void> {
-    TokenIconPacks.aegis_icon_packs = TokenIconPacks.aegis_icon_packs.filter(pack => pack.on_device_path !== icon_pack.on_device_path);
+    TokenIconPacks.enabled_packs = TokenIconPacks.enabled_packs.filter(id => id !== icon_pack.uuid);
+    if (TokenIconPacks.enabled_packs.length === 0) {
+      TokenIconPacks.enabled_packs = [BUILTIN_DEFAULT_PACK_ID];
+    }
+    AppPreference.saveEnabledPacks(TokenIconPacks.enabled_packs);
+    TokenIconPacks.aegis_icon_packs = TokenIconPacks.aegis_icon_packs.filter(
+      pack => pack.on_device_path !== icon_pack.on_device_path
+    );
+    TokenIconPacks.rebuildPackMap();
     return fileIo.rmdir(icon_pack.on_device_path);
   }
 
   public static getIconByIssuer(issuer: string): string {
-    if (TokenIconPacks.selected_icon_pack === 0) {
-      const icon_path = TokenIconPacks.default_icon_pack.getIconPathByIssuer(issuer);
-      return icon_path;
-    } else {
-      const index = (TokenIconPacks.selected_icon_pack - 1) % TokenIconPacks.aegis_icon_packs.length;
-      if (TokenIconPacks.aegis_icon_packs.length === 0) {
-        return '';
-      }
-      const icon_path = TokenIconPacks.aegis_icon_packs[index].getIconPathByIssuer(issuer);
-      return icon_path;
+    if (!issuer) {
+      return '';
     }
+    for (const packId of TokenIconPacks.enabled_packs) {
+      if (packId === BUILTIN_DEFAULT_PACK_ID) {
+        const icon = TokenIconPacks.default_icon_pack.getIconPathByIssuer(issuer);
+        if (icon !== '') return icon;
+      } else {
+        const pack = TokenIconPacks.packByUuid.get(packId);
+        if (pack && !pack.invalid) {
+          const icon = pack.getIconPathByIssuer(issuer);
+          if (icon !== '') return icon;
+        }
+      }
+    }
+    return '';
+  }
+
+  private static isAutoResolvedPath(path: string): boolean {
+    if (path === '') return true;
+    if (path.startsWith('rawfile://')) return true;
+    if (path.startsWith('file://')) {
+      const userPrefix = 'file://' + TokenIconPacks.user_added_icon_packs.user_icon_path + '/';
+      return !path.startsWith(userPrefix);
+    }
+    return false;
+  }
+
+  public static rematchTokens(tokens: TokenConfig[]): TokenConfig[] {
+    const changed: TokenConfig[] = [];
+    for (const token of tokens) {
+      const oldIconPath = token.TokenIconPath ?? '';
+      if (!TokenIconPacks.isAutoResolvedPath(oldIconPath)) continue;
+      const newIconPath = TokenIconPacks.getIconByIssuer(token.TokenIssuer);
+      if (newIconPath !== oldIconPath) {
+        token.TokenIconPath = newIconPath || undefined;
+        changed.push(token);
+      }
+    }
+    return changed;
+  }
+
+  public static notifyChanged(): void {
+    const ctx = AppStorage.get<common.UIAbilityContext>('appContext');
+    ctx?.eventHub.emit(EVENT_NAMES.ICON_PACK_CHANGED);
   }
 }
 

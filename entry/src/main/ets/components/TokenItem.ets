@@ -18,6 +18,7 @@ import {
   SuffixCustomBuilder
 } from '@kit.UIDesignKit';
 import { CommonConstants } from '../utils/CommonConstants';
+import { AppFonts } from '../utils/AppFonts';
 
 let current_token_hide_map: Map<string, boolean> = new Map();
 let tkStore = TokenStore.getInstance();
@@ -26,7 +27,8 @@ let tkStore = TokenStore.getInstance();
 @ComponentV2
 export struct TokenItem {
   @Require @Param Config: TokenConfig = new TokenConfig();
-  @Event Update: (conf: TokenConfig) => void = () => {};
+  @Event Update: (conf: TokenConfig) => Promise<boolean> = async () => false;
+  @Param sortMode: boolean = false;
 
   @Local token_preference: TokenPreference = AppStorageV2.connect(TokenPreference) as TokenPreference;
   @Local window: AppWindowInfo = AppStorageV2.connect(AppWindowInfo) as AppWindowInfo;
@@ -37,11 +39,13 @@ export struct TokenItem {
   @Local TokenLeftPeriod: number = 0;
   @Local btn_hotp_clicked: number = 0;
   @Local TokenHide: boolean = current_token_hide_map[this.Config.TokenUUID] ?? true;
+  @Local isLongPressMenuShown: boolean = false;
 
   @Local menu_icon_trash: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.trash')).fontSize('22vp').fontColor([Color.Red]);
   @Local menu_icon_qrcode: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.qrcode')).fontSize('22vp');
   @Local menu_icon_edit: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.square_and_pencil')).fontSize('22vp');
   @Local menu_icon_copy: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.doc_text_on_doc_text')).fontSize('22vp');
+  @Local menu_icon_sort: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.list_bullet')).fontSize('22vp');
 
   private dialog_totp_config?: CustomDialogController;
   private dialog_forti_config?: CustomDialogController;
@@ -224,6 +228,7 @@ export struct TokenItem {
                 this.token_color_expiring : this.token_color_normal)
               .fontSize(this.token_preference.app_appearance_token_font_size)
               .fontWeight(this.token_preference.app_appearance_token_font_weight)
+              .fontFamily(AppFonts.CODE_FONT)
               .gesture(
                 LongPressGesture()
                   .onAction(() => {
@@ -244,6 +249,7 @@ export struct TokenItem {
                 .maxLines(1)
                 .fontColor($r('app.color.str_gray'))
                 .fontSize(10)
+                .fontFamily(AppFonts.CODE_FONT)
             }
           }
 
@@ -280,34 +286,78 @@ export struct TokenItem {
   }
 
   build() {
-    Column() {
-      HdsListItemCard({
-        prefixItem: new PrefixCustomBuilder((): void => { this.TokenIconBuilder() }),
-        textItem: {
-          customBuilder: (): void => { this.TextContentBuilder() }
-        },
-        suffixItem: new SuffixCustomBuilder((): void => { this.TokenCodeBuilder() }),
-        cardHeight: this.token_preference.app_appearance_item_height,
-        cardPrefixMargin: this.token_preference.app_appearance_token_list_item_prefix_padding,
-        cardSuffixMargin: this.token_preference.app_appearance_token_list_item_suffix_padding,
-        cardBackgroundColor: $r('app.color.item_bg'),
-        onClick: () => {
-          if (this.TokenHide && this.token_preference.app_safety_hide_token_enable) {
-            this.TokenHide = !this.TokenHide;
-            current_token_hide_map[this.Config.TokenUUID] = false;
-          } else if (this.token_preference.app_safety_hide_token_enable) {
-            this.TokenHide = !this.TokenHide;
-            current_token_hide_map[this.Config.TokenUUID] = true;
+    if (this.sortMode) {
+      // 排序模式：禁用上下文菜单和长按手势，Suffix 显示排序图标
+      Column() {
+        HdsListItemCard({
+          prefixItem: new PrefixCustomBuilder((): void => { this.TokenIconBuilder() }),
+          textItem: {
+            customBuilder: (): void => { this.TextContentBuilder() }
+          },
+          suffixItem: new SuffixCustomBuilder((): void => { this.TokenSortIconBuilder() }),
+          cardHeight: this.token_preference.app_appearance_item_height,
+          cardPrefixMargin: this.token_preference.app_appearance_token_list_item_prefix_padding,
+          cardSuffixMargin: this.token_preference.app_appearance_token_list_item_suffix_padding,
+          cardBackgroundColor: $r('app.color.item_bg'),
+        })
+      }
+    } else {
+      Column() {
+        HdsListItemCard({
+          prefixItem: new PrefixCustomBuilder((): void => { this.TokenIconBuilder() }),
+          textItem: {
+            customBuilder: (): void => { this.TextContentBuilder() }
+          },
+          suffixItem: new SuffixCustomBuilder((): void => { this.TokenCodeBuilder() }),
+          cardHeight: this.token_preference.app_appearance_item_height,
+          cardPrefixMargin: this.token_preference.app_appearance_token_list_item_prefix_padding,
+          cardSuffixMargin: this.token_preference.app_appearance_token_list_item_suffix_padding,
+          cardBackgroundColor: $r('app.color.item_bg'),
+          onClick: () => {
+            if (this.TokenHide && this.token_preference.app_safety_hide_token_enable) {
+              this.TokenHide = !this.TokenHide;
+              current_token_hide_map[this.Config.TokenUUID] = false;
+            } else if (this.token_preference.app_safety_hide_token_enable) {
+              this.TokenHide = !this.TokenHide;
+              current_token_hide_map[this.Config.TokenUUID] = true;
+            }
           }
+        })
+      }
+      .gesture(
+        LongPressGesture({ duration: this.token_preference.app_appearance_long_press_duration })
+          .onAction(() => {
+            this.isLongPressMenuShown = true;
+          })
+      )
+      .bindContextMenu(this.isLongPressMenuShown, this.TokenRightCtxMenu, {
+        preview: MenuPreviewMode.IMAGE,
+        hapticFeedbackMode: HapticFeedbackMode.AUTO,
+        onDisappear: () => {
+          this.isLongPressMenuShown = false;
         }
       })
+      .bindContextMenu(this.TokenRightCtxMenu, ResponseType.RightClick, { enableArrow: true })
     }
-    .bindContextMenu(this.TokenRightCtxMenu, ResponseType.RightClick, { enableArrow: true })
+  }
+
+  @Builder
+  TokenSortIconBuilder() {
+    SymbolGlyph($r('sys.symbol.list_bullet'))
+      .fontSize(24)
+      .fontColor([$r('sys.color.icon_secondary')])
   }
 
   @Builder
   TokenRightCtxMenu() {
     Menu() {
+      MenuItem({ symbolStartIcon: this.menu_icon_sort, content: $r('app.string.token_right_menu_sort') })
+        .onClick(() => {
+          if (this.appCtx.eventHub != undefined) {
+            this.appCtx.eventHub.emit(EVENT_NAMES.START_TOKEN_SORT);
+          }
+        })
+        .accessibilityText($r('app.string.token_right_menu_sort'))
       MenuItem({ symbolStartIcon: this.menu_icon_copy, content: $r('app.string.token_right_menu_copy') })
         .onClick(() => {
           copyText(this.TokenNumber, `${this.TokenNumber} copied`);
@@ -331,8 +381,8 @@ export struct TokenItem {
             this.dialog_totp_config = new CustomDialogController({
               builder: TOTPConfigDialog({
                 conf_json: JSON.stringify(this.Config),
-                confirm: (new_conf) => {
-                  this.Update(JSON.parse(new_conf))
+                confirm: async (new_conf): Promise<boolean> => {
+                  return await this.Update(JSON.parse(new_conf))
                 }
               })
             })
@@ -341,8 +391,8 @@ export struct TokenItem {
             this.dialog_forti_config = new CustomDialogController({
               builder: FortiConfigDialog({
                 conf_json: JSON.stringify(this.Config),
-                confirm: (new_conf) => {
-                  this.Update(JSON.parse(new_conf))
+                confirm: async (new_conf): Promise<boolean> => {
+                  return await this.Update(JSON.parse(new_conf))
                 }
               })
             })
@@ -351,8 +401,8 @@ export struct TokenItem {
             this.dialog_steam_config = new CustomDialogController({
               builder: SteamConfigDialog({
                 conf_json: JSON.stringify(this.Config),
-                confirm: (new_conf) => {
-                  this.Update(JSON.parse(new_conf))
+                confirm: async (new_conf): Promise<boolean> => {
+                  return await this.Update(JSON.parse(new_conf))
                 }
               })
             })
@@ -363,7 +413,9 @@ export struct TokenItem {
       MenuItem({ symbolStartIcon: this.menu_icon_trash, content: $r('app.string.token_right_menu_delete') })
         .onClick(() => {
           this.getUIContext().showAlertDialog({
-            message: $r('app.string.alert_remove_confirm_msg', this.Config.TokenName),
+            title: $r('app.string.alert_remove_title', this.Config.TokenIssuer),
+            subtitle: this.Config.TokenName,
+            message: $r('app.string.alert_remove_confirm_msg'),
             autoCancel: true,
             alignment: DialogAlignment.Center,
             primaryButton: {
@@ -374,7 +426,7 @@ export struct TokenItem {
               }
             },
             secondaryButton: {
-              value: $r('app.string.dialog_btn_confirm'),
+              value: $r('app.string.dialog_btn_delete'),
               fontColor: Color.Red,
               action: async () => {
                 tkStore.deleteToken(this.Config.TokenUUID);

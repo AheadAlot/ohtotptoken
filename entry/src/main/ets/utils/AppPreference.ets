@@ -5,11 +5,15 @@ import { ScrollEffectType } from "@kit.UIDesignKit";
 /**
  * 事件名称常量
  */
+export const BUILTIN_DEFAULT_PACK_ID = '__builtin_default_pack__';
+
 export enum EVENT_NAMES {
   /** 顶部模糊效果类型变更事件 */
   TOP_EFFECT_TYPE_CHANGED = 'onTopEffectTypeChanged',
   /** Token变更事件 */
   TOKEN_CHANGED = 'onTokenChanged',
+  /** 单条Token更新事件（精准刷新，携带 TokenConfig） */
+  TOKEN_SINGLE_UPDATED = 'onTokenSingleUpdated',
   /** 时间戳变更事件 */
   TIMESTAMP_CHANGED = 'onTimestampChanged',
   /** 文件拖放事件 */
@@ -30,6 +34,8 @@ export enum EVENT_NAMES {
   TOGGLE_TOKEN_SEARCH = 'toggleTokenSearch',
   /** 握手偏好设置变更事件 */
   HOLDING_HAND_PREFERENCE_CHANGED = 'holdingHandPreferenceChanged',
+  /** 启动Token排序页面事件 */
+  START_TOKEN_SORT = 'onStartTokenSort',
 }
 
 /**
@@ -68,10 +74,10 @@ export enum PREF_KEYS {
   CLOUD_SYNC_LAST_TIME = 'app_cloud_sync_last_time',
   /** KV数据库同步时间 */
   DB_KV_SYNC_TIME = 'app_db_kv_sync_time',
-  /** KV数据库归档时间 */
-  DB_KV_ARCHIVE_TIME = 'app_db_kv_archive_time',
-  /** 选中的图标包 */
+  /** 选中的图标包（已废弃，仅用于迁移） */
   APPEARANCE_ICON_PACK_SELECTED = 'app_appearance_icon_pack_selected',
+  /** 已启用的图标包列表（JSON 数组） */
+  APPEARANCE_ICON_PACK_ENABLED = 'app_appearance_icon_pack_enabled',
   /** 隐藏Token开关 */
   SAFETY_HIDE_TOKEN_ENABLE = 'app_safety_hide_token_enable',
   /** 防窥保护开关 */
@@ -144,12 +150,18 @@ export enum PREF_KEYS {
   APPEARANCE_TOKEN_LIST_ITEM_SUFFIX_PADDING = 'app_appearance_token_list_item_suffix_padding',
   /** 外观列表链式动画开关 */
   APPEARANCE_CHAIN_ANIMATION_ENABLE = 'app_appearance_chain_animation_enable',
+  /** 长按菜单触发时长（ms），范围 200-1000 */
+  APPEARANCE_LONG_PRESS_DURATION = 'app_appearance_long_press_duration',
   /** 快速扫描URI */
   WANT_URI = 'app_want_uri',
   /** 是否启用华为云备份 */
   APPEARANCE_HUAWEI_CLOUD_SYNC_ENABLE="app_huawei_cloud_sync_enable",
   /** 主密码功能弃用告知已确认（一次性迁移标记） */
   MASTER_KEY_DEPRECATION_ACKNOWLEDGED = 'app_master_key_deprecation_acknowledged',
+  /** ASSET Secret 迁移已完成（持久化标记，避免每次加载重复迁移） */
+  ASSET_MIGRATION_DONE = 'app_asset_migration_done',
+  /** 图标包云备份最后同步时间 */
+  ICON_PACK_CLOUD_SYNC_TIME = 'app_icon_pack_cloud_sync_time',
 }
 
 /** 主密码旧偏好键名（已废弃，仅用于兼容性检测与清理） */
@@ -286,9 +298,10 @@ export class TokenPreference {
   @Trace app_appearance_user_name_font_size = 10;
   @Trace app_appearance_user_name_font_weight = 400;
   @Trace app_appearance_item_max_width = 800;
-  @Trace app_appearance_token_list_item_prefix_padding = 10;
-  @Trace app_appearance_token_list_item_suffix_padding = 10;
+  @Trace app_appearance_token_list_item_prefix_padding = 16;
+  @Trace app_appearance_token_list_item_suffix_padding = 16;
   @Trace app_appearance_chain_animation_enable = true;
+  @Trace app_appearance_long_press_duration = 300;
 }
 
 /**
@@ -310,6 +323,10 @@ export enum ROUTE_NAMES {
   WebPage = 'WebPage',
   /** 卡片令牌配置页面 */
   TokenCardConfigPage = 'TokenCardConfigPage',
+  /** Token排序页面 */
+  TokenSortPage = 'TokenSortPage',
+  /** Token搜索页面 */
+  TokenSearchPage = 'TokenSearchPage',
   /** App首页 */
   IndexPage = 'pages/Index',
 }
@@ -322,7 +339,7 @@ export enum EXTERNAL_URLS {
   /** 问卷反馈 */
   FEEDBACK_SURVEY = 'https://wj.qq.com/s2/24518107/2b26/',
   /** GitHub反馈 */
-  FEEDBACK_GITHUB = 'https://github.com/SolidFaker/ohtotptoken/issues',
+  FEEDBACK_GITHUB = 'https://github.com/OHOTP/ohtotptoken/issues',
 }
 
 /**
@@ -359,11 +376,11 @@ export class AppPreference {
     [PREF_KEYS.DB_RDS_SYNC_ENABLE, false],
     // kv数据库同步时间
     [PREF_KEYS.DB_KV_SYNC_TIME, ''],
-    // kv数据库存档时间
-    [PREF_KEYS.DB_KV_ARCHIVE_TIME, ''],
     [PREF_KEYS.SHOW_GUIDE_TIPS, true],
     // 主密码弃用告知已确认
     [PREF_KEYS.MASTER_KEY_DEPRECATION_ACKNOWLEDGED, false],
+    // ASSET Secret 迁移已完成
+    [PREF_KEYS.ASSET_MIGRATION_DONE, false],
     // 是否处于debug模式
     [PREF_KEYS.DEBUG_MODE_ON, false],
     // 快速扫描URI
@@ -402,9 +419,10 @@ export class AppPreference {
     [PREF_KEYS.APPEARANCE_USER_NAME_FONT_SIZE, 10],
     [PREF_KEYS.APPEARANCE_USER_NAME_FONT_WEIGHT, 400],
     [PREF_KEYS.APPEARANCE_ITEM_MAX_WIDTH, 800],
-    [PREF_KEYS.APPEARANCE_TOKEN_LIST_ITEM_PREFIX_PADDING, 10],
-    [PREF_KEYS.APPEARANCE_TOKEN_LIST_ITEM_SUFFIX_PADDING, 10],
+    [PREF_KEYS.APPEARANCE_TOKEN_LIST_ITEM_PREFIX_PADDING, 16],
+    [PREF_KEYS.APPEARANCE_TOKEN_LIST_ITEM_SUFFIX_PADDING, 16],
     [PREF_KEYS.APPEARANCE_CHAIN_ANIMATION_ENABLE, true],
+    [PREF_KEYS.APPEARANCE_LONG_PRESS_DURATION, 300],
     // 外观-顶部模糊类型
     [PREF_KEYS.APPEARANCE_TOP_EFFECT_TYPE, SettingTopEffectType.IMMERSIVE_GRADIENT_BLUR],
     [PREF_KEYS.APPEARANCE_HUAWEI_CLOUD_SYNC_ENABLE, false],
@@ -446,15 +464,19 @@ export class AppPreference {
    * 从持久化存储加载所有设置
    * @returns Promise对象，表示加载操作完成
    */
-  public static async loadSettings(): Promise<void> {
-    const promises = Array.from(AppPreference.settings.keys()).map(async (k) => {
-      await AppPreference.prefMgr.getValue<SettingValue>(k).then((val) => {
-        if (val !== undefined && val !== null) {
+   public static async loadSettings(): Promise<void> {
+    await AppPreference.prefMgr.ensureInitialized();
+    const allValues = AppPreference.prefMgr.getAllValues();
+    for (const k of AppPreference.settings.keys()) {
+      const raw = allValues[k];
+      if (raw !== undefined && raw !== null && raw !== '') {
+        try {
+          const val: SettingValue = (typeof raw === 'string' ? JSON.parse(raw) : raw) as SettingValue;
           AppPreference.settings.set(k, val);
+        } catch (_) {
         }
-      })
-    });
-    await Promise.all(promises);
+      }
+    }
     AppPreference.loadTokenAppearance();
   }
 
@@ -538,6 +560,8 @@ export class AppPreference {
       AppPreference.getPreference(PREF_KEYS.APPEARANCE_TOKEN_LIST_ITEM_SUFFIX_PADDING) as number;
     token_appearance.app_appearance_chain_animation_enable =
       AppPreference.getPreference(PREF_KEYS.APPEARANCE_CHAIN_ANIMATION_ENABLE) as boolean;
+    token_appearance.app_appearance_long_press_duration =
+      Math.max(200, Math.min(1000, AppPreference.getPreference(PREF_KEYS.APPEARANCE_LONG_PRESS_DURATION) as number));
   }
 
   /**
@@ -549,6 +573,35 @@ export class AppPreference {
       AppPreference.setPreference(entry[0], entry[1]);
     }
     AppPreference.loadTokenAppearance();
+  }
+
+  public static loadEnabledPacks(): string[] {
+    const raw = AppPreference.getPreference(PREF_KEYS.APPEARANCE_ICON_PACK_ENABLED) as string;
+    if (raw && raw !== '') {
+      try {
+        const parsed = JSON.parse(raw) as string[];
+        if (parsed && parsed.length > 0) {
+          return parsed;
+        }
+      } catch (_) {}
+    }
+    return [BUILTIN_DEFAULT_PACK_ID];
+  }
+
+  public static hasEnabledPacksMigrated(): boolean {
+    const enabled = AppPreference.getPreference(PREF_KEYS.APPEARANCE_ICON_PACK_ENABLED) as string;
+    return enabled !== undefined && enabled !== null && enabled !== '';
+  }
+
+  public static getLegacySelectedPack(): number {
+    return Number(AppPreference.getPreference(PREF_KEYS.APPEARANCE_ICON_PACK_SELECTED)) || 0;
+  }
+
+  public static saveEnabledPacks(packs: string[]): void {
+    if (packs.length === 0) {
+      packs = [BUILTIN_DEFAULT_PACK_ID];
+    }
+    AppPreference.setPreference(PREF_KEYS.APPEARANCE_ICON_PACK_ENABLED, JSON.stringify(packs));
   }
 
   public static saveSettings(): void {
