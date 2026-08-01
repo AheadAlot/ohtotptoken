@@ -1,5 +1,6 @@
 import { AppWindowInfo } from "../entryability/EntryAbility";
 import { AppStorageV2 } from "@kit.ArkUI";
+import { SETTING_ROW_MIN_HEIGHT, SETTING_ROW_PADDING } from './SettingStyle';
 
 export class SliderItem {
   name: ResourceStr = '';
@@ -115,6 +116,8 @@ export struct SubItemSlider {
         })
       }
     }
-    .padding(10)
+    .padding(SETTING_ROW_PADDING)
+    .constraintSize({ minHeight: SETTING_ROW_MIN_HEIGHT })
+    .justifyContent(FlexAlign.Center)
   }
 }

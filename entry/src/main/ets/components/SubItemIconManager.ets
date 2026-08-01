@@ -11,6 +11,7 @@ import { throttle, startBrowsableAbility } from '../utils/UiUtils';
 import { showSnackBar, SnackBarNotifyType } from '../utils/HdsSnackBarUtils';
 import { TokenStore } from '../utils/TokenStore';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { SETTING_ROW_MIN_HEIGHT, SETTING_ROW_PADDING } from './SettingStyle';
 
 interface PackItem {
   id: string;
@@ -473,6 +474,8 @@ export struct SubItemIconManager {
       }
     }
     .width('100%')
-    .padding(10)
+    .padding(SETTING_ROW_PADDING)
+    .constraintSize({ minHeight: SETTING_ROW_MIN_HEIGHT })
+    .justifyContent(FlexAlign.Center)
   }
 }

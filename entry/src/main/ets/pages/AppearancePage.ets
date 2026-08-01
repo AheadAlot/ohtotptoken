@@ -14,6 +14,7 @@ import { AppWindowInfo } from '../entryability/EntryAbility';
 import { common } from '@kit.AbilityKit';
 import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit';
 import { CommonConstants } from '../utils/CommonConstants';
+import { SETTING_PAGE_INSET } from '../components/SettingStyle';
 
 @Entry
 @Preview
@@ -206,7 +207,7 @@ export struct AppearancePage {
                 })
               }
             }
-            .padding({ left: 10, right: 10 })
+            .padding({ left: SETTING_PAGE_INSET, right: SETTING_PAGE_INSET })
 
             ListItem() {
               SettingItem({ title: $r('app.string.custom_layout') }) {
@@ -406,7 +407,7 @@ export struct AppearancePage {
 
               }
             }
-            .padding({ left: 10, right: 10 })
+            .padding({ left: SETTING_PAGE_INSET, right: SETTING_PAGE_INSET })
 
             ListItem() {
               SettingItem({ title: $r('app.string.custom_decoration_color') }) {
@@ -549,7 +550,7 @@ export struct AppearancePage {
                 })
               }
             }
-            .padding({ left: 10, right: 10 })
+            .padding({ left: SETTING_PAGE_INSET, right: SETTING_PAGE_INSET })
 
             ListItem() {
               SettingItem({ title: $r('app.string.custom_appearance_cmd') }) {
@@ -562,7 +563,7 @@ export struct AppearancePage {
                   })
               }
             }
-            .padding({ left: 10, right: 10 })
+            .padding({ left: SETTING_PAGE_INSET, right: SETTING_PAGE_INSET })
 
             ListItem()
               .height(this.window.AvoidBottomHeight + 56) // 56: navigation_height

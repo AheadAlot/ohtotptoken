@@ -6,6 +6,7 @@ import { ROUTE_NAMES, EXTERNAL_URLS } from '../../utils/AppPreference';
 import { WebPage, WebPageParams } from '../WebPage';
 import { hdsMaterial, HdsNavigation, HdsNavigationTitleMode, ScrollEffectType } from '@kit.UIDesignKit';
 import { SubItemDivider } from '../../components/SubItemDivider';
+import { SETTING_PAGE_INSET } from '../../components/SettingStyle';
 
 @Preview
 @ComponentV2
@@ -59,7 +60,7 @@ export struct FeedbackSheet {
                 //   }, 1000))
               }
             }
-            .padding({ left: 10, right: 10 })
+            .padding({ left: SETTING_PAGE_INSET, right: SETTING_PAGE_INSET })
           }
           .clip(false)
           .width('100%')

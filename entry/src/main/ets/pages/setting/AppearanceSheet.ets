@@ -14,6 +14,7 @@ import { common, ConfigurationConstant } from '@kit.AbilityKit';
 import { throttle } from '../../utils/UiUtils';
 import { AppearancePage } from '../AppearancePage';
 import { hdsMaterial, HdsNavigation, HdsNavigationTitleMode, ScrollEffectType } from '@kit.UIDesignKit';
+import { SETTING_PAGE_INSET } from '../../components/SettingStyle';
 
 @Preview
 @ComponentV2
@@ -119,11 +120,9 @@ export struct AppearanceSheet {
                   .onClick(throttle((event) => {
                     this.pageInfos.pushPathByName(ROUTE_NAMES.AppearancePage, null);
                   }, 1000))
-
-                SubItemDivider()
               }
             }
-            .padding({ left: 10, right: 10 })
+            .padding({ left: SETTING_PAGE_INSET, right: SETTING_PAGE_INSET })
           }
           .clip(false)
           .width('100%')

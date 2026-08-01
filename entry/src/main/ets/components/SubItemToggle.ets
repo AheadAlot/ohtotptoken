@@ -1,3 +1,4 @@
+import { SETTING_ROW_MIN_HEIGHT, SETTING_ROW_PADDING } from './SettingStyle';
 
 @Preview
 @ComponentV2
@@ -60,6 +61,8 @@ export struct SubItemToggle {
       .width('100%')
       .alignItems(VerticalAlign.Center)
     }
-    .padding(10)
+    .padding(SETTING_ROW_PADDING)
+    .constraintSize({ minHeight: SETTING_ROW_MIN_HEIGHT })
+    .justifyContent(FlexAlign.Center)
   }
 }

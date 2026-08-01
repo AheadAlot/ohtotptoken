@@ -12,6 +12,7 @@ import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffec
 import { CommonConstants } from '../utils/CommonConstants';
 import { showSnackBar, SnackBarNotifyType } from '../utils/HdsSnackBarUtils';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { SETTING_PAGE_INSET } from '../components/SettingStyle';
 
 const TAG = 'ShowDataSyncDetailsPage';
 const DOMAIN = 0xFF00;
@@ -89,7 +90,7 @@ export struct ShowDataSyncDetailsPage {
                   }
 
                 }
-                .padding({ left: 10, right: 10 })
+                .padding({ left: SETTING_PAGE_INSET, right: SETTING_PAGE_INSET })
 
                 ListItem() {
                   SettingItem({ title: $r('app.string.data_kv_sync_time') }) {
@@ -125,7 +126,7 @@ export struct ShowDataSyncDetailsPage {
                       })
                   }
                 }
-                .padding({ left: 10, right: 10 })
+                .padding({ left: SETTING_PAGE_INSET, right: SETTING_PAGE_INSET })
 
               }
               .chainAnimation(AppPreference.getPreference(PREF_KEYS.APPEARANCE_CHAIN_ANIMATION_ENABLE) as boolean)

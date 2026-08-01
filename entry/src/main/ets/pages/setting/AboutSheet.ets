@@ -5,6 +5,7 @@ import { AppStorageV2, curves } from '@kit.ArkUI';
 import { showSnackBar, SnackBarNotifyType } from '../../utils/HdsSnackBarUtils';
 import { AppPreference, PREF_KEYS } from '../../utils/AppPreference';
 import { hdsMaterial, HdsNavigation, HdsNavigationTitleMode, ScrollEffectType } from '@kit.UIDesignKit';
+import { SETTING_PAGE_INSET } from '../../components/SettingStyle';
 
 @Preview
 @ComponentV2
@@ -46,7 +47,7 @@ export struct AboutSheet {
                 .padding(10)
             }
           }
-          .padding({ left: 10, right: 10 })
+          .padding({ left: SETTING_PAGE_INSET, right: SETTING_PAGE_INSET })
           .onClick(() => {
             if (!this.debug_mode_is_on) {
               setTimeout(() => {
@@ -72,7 +73,7 @@ export struct AboutSheet {
                 .padding(10)
             }
           }
-          .padding({ left: 10, right: 10 })
+          .padding({ left: SETTING_PAGE_INSET, right: SETTING_PAGE_INSET })
 
           ListItemGroup() {
             ListItem() {
@@ -84,7 +85,7 @@ export struct AboutSheet {
               .justifyContent(FlexAlign.Center)
               .width('100%')
             }
-            .padding({ left: 10, right: 10 })
+            .padding({ left: SETTING_PAGE_INSET, right: SETTING_PAGE_INSET })
           }
         }
         .clip(false)

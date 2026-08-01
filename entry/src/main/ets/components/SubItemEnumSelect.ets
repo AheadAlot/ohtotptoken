@@ -1,4 +1,5 @@
 import {EnumSelectOption} from '../utils/AppPreference';
+import { SETTING_ROW_MIN_HEIGHT, SETTING_ROW_PADDING } from './SettingStyle';
 
 /**
  * 增强版选择组件，支持枚举值映射
@@ -92,6 +93,8 @@ export struct SubItemEnumSelect {
       .width('100%')
       .alignItems(VerticalAlign.Center)
     }
-    .padding(10)
+    .padding(SETTING_ROW_PADDING)
+    .constraintSize({ minHeight: SETTING_ROW_MIN_HEIGHT })
+    .justifyContent(FlexAlign.Center)
   }
 }

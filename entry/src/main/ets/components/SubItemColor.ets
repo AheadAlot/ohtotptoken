@@ -2,6 +2,7 @@ import { ColorSelectDialog } from "../dialogs/ColorSelectDialog";
 import { AppWindowInfo } from "../entryability/EntryAbility";
 import { colorHex } from "../utils/ColorUtils";
 import { AppStorageV2 } from "@kit.ArkUI";
+import { SETTING_ROW_MIN_HEIGHT, SETTING_ROW_PADDING } from './SettingStyle';
 
 export class ColorItem {
   name: ResourceStr = '';
@@ -112,6 +113,8 @@ export struct SubItemColor {
 
       }
     }
-    .padding(10)
+    .padding(SETTING_ROW_PADDING)
+    .constraintSize({ minHeight: SETTING_ROW_MIN_HEIGHT })
+    .justifyContent(FlexAlign.Center)
   }
 }
