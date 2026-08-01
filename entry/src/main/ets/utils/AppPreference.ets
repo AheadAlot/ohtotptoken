@@ -36,6 +36,8 @@ export enum EVENT_NAMES {
   HOLDING_HAND_PREFERENCE_CHANGED = 'holdingHandPreferenceChanged',
   /** 启动Token排序页面事件 */
   START_TOKEN_SORT = 'onStartTokenSort',
+  /** 华为账号状态变更事件（登录/登出/初始化完成后由 Index 广播,SheetCoordinator 监听同步） */
+  HUAWEI_ACCOUNT_STATE_CHANGED = 'onHuaweiAccountStateChanged',
 }
 
 /**
