@@ -1,8 +1,8 @@
 import { SubItemButton } from '../../components/SubItemButton';
 import { SettingItem } from '../../components/SettingItem';
 import { SubItemDivider } from '../../components/SubItemDivider';
-import { throttle } from '../../utils/UiUtils';
-import { ROUTE_NAMES } from '../../utils/AppPreference';
+import { throttle } from 'common';
+import { ROUTE_NAMES } from 'common';
 import { WebPage, WebPageParams } from '../WebPage';
 import { hdsMaterial, HdsNavigation, HdsNavigationTitleMode, ScrollEffectType } from '@kit.UIDesignKit';
 import { SETTING_PAGE_INSET } from '../../components/SettingStyle';

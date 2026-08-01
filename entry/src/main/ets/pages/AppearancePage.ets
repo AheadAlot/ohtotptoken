@@ -4,16 +4,16 @@ import { SubItemDivider } from '../components/SubItemDivider';
 import { SubItemToggle } from '../components/SubItemToggle';
 import { TokenItem } from '../components/TokenItem';
 import { PageScaffold } from '../components/PageScaffold';
-import { AppPreference, TokenPreference, EVENT_NAMES, PREF_KEYS } from '../utils/AppPreference';
-import { otpType, TokenConfig } from '../utils/TokenConfig';
+import { AppPreference, TokenPreference, EVENT_NAMES, PREF_KEYS } from 'common';
+import { otpType, TokenConfig } from 'common';
 import { systemDateTime } from '@kit.BasicServicesKit';
 import { SubItemColor } from '../components/SubItemColor';
 import { SubItemSlider } from '../components/SubItemSlider';
 import { SubItemButton } from '../components/SubItemButton';
-import { AppWindowInfo } from '../entryability/EntryAbility';
+import { AppWindowInfo } from 'common';
 import { common } from '@kit.AbilityKit';
 import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit';
-import { CommonConstants } from '../utils/CommonConstants';
+import { CommonConstants } from 'common';
 import { SETTING_PAGE_INSET } from '../components/SettingStyle';
 
 @Entry

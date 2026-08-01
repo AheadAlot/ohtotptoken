@@ -1,0 +1,12 @@
+{
+  "name": "wearable",
+  "version": "1.0.0",
+  "description": "ohtotptoken 手表端独立 HAP",
+  "main": "",
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "common": "file:../common",
+    "uikit": "file:../uikit"
+  }
+}

@@ -1,15 +1,15 @@
 import { BusinessError } from '@kit.BasicServicesKit';
-import { showSnackBar, SnackBarNotifyType } from '../../utils/HdsSnackBarUtils';
+import { showSnackBar, SnackBarNotifyType } from 'common';
 import { SubItemToggle } from '../../components/SubItemToggle'
 import { AppStorageV2, curves } from '@kit.ArkUI';
-import { AppPreference, TokenPreference, PREF_KEYS } from '../../utils/AppPreference';
+import { AppPreference, TokenPreference, PREF_KEYS } from 'common';
 import { SettingItem } from '../../components/SettingItem';
 import { userAuth } from '@kit.UserAuthenticationKit';
 import { SubItemDivider } from '../../components/SubItemDivider';
-import { AppWindowInfo } from '../../entryability/EntryAbility';
+import { AppWindowInfo } from 'common';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { hdsMaterial, HdsNavigation, HdsNavigationTitleMode, ScrollEffectType } from '@kit.UIDesignKit';
-import { DlpAntiPeepManager } from '../../utils/DlpAntiPeepManager';
+import { DlpAntiPeepManager } from 'common';
 import { common } from '@kit.AbilityKit';
 import { SETTING_PAGE_INSET } from '../../components/SettingStyle';
 

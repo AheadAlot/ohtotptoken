@@ -8,28 +8,15 @@ import {
 import { hilog, hiTraceMeter } from '@kit.PerformanceAnalysisKit';
 import { AppStorageV2, window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { AppPreference, SettingColorMode, PREF_KEYS, EVENT_NAMES } from '../utils/AppPreference';
+import { AppPreference, SettingColorMode, PREF_KEYS, EVENT_NAMES, AppWindowInfo } from 'common';
 import { relationalStore  } from '@kit.ArkData';
-import { DeviceInfoHelper } from '../utils/DeviceInfoHelper';
-import { MaterialPolicy } from '../utils/MaterialPolicy';
-import { DlpAntiPeepManager } from '../utils/DlpAntiPeepManager';
+import { DeviceInfoHelper } from 'common';
+import { MaterialPolicy } from 'common';
+import { DlpAntiPeepManager } from 'common';
 import { formInfo } from '@kit.FormKit';
 
 //单版本分布式键值数据库
 let rdbStore: relationalStore.RdbStore | null = null;
-
-@ObservedV2
-export class AppWindowInfo {
-  @Trace AvoidTopHeight: number = 0;
-  @Trace AvoidBottomHeight: number = 0;
-  @Trace WidthBreakpoint: WidthBreakpoint = 0;
-  @Trace HeightBreakpoint: HeightBreakpoint = 0;
-  @Trace Size: window.Size = { width: 0, height: 0};
-  @Trace ColorMode: ConfigurationConstant.ColorMode = -1;
-  @Trace Context?: common.UIAbilityContext;
-  @Trace uiContext?: UIContext;
-  @Trace WindowClass?: window.Window;
-}
 
 export default class EntryAbility extends UIAbility {
   private uiContext?: UIContext;

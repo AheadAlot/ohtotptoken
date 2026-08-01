@@ -1,6 +1,6 @@
 import { uniformTypeDescriptor } from '@kit.ArkData';
 import { HdsNavigation, ScrollEffectType } from '@kit.UIDesignKit';
-import { ROUTE_NAMES } from '../utils/AppPreference';
+import { ROUTE_NAMES } from 'common';
 // [冷启动优化] 以下 NavDestination 页面仅在用户导航时触发评估
 import lazy { TokenCardConfigPage } from '../pages/TokenCardConfigPage'
 import lazy { TokenSortPage } from '../pages/TokenSortPage'

@@ -1,24 +1,24 @@
 import { systemDateTime } from '@kit.BasicServicesKit';
-import { otpType, TokenConfig } from '../utils/TokenConfig';
-import { convertToken2URI, copyText, generateOTP } from '../utils/TokenUtils';
-import { TokenIcon } from './TokenIcon';
-import { SteamUtils } from '../utils/SteamUtils';
-import { AppPreference, TokenPreference, EVENT_NAMES, PREF_KEYS } from '../utils/AppPreference';
+import { otpType, TokenConfig } from 'common';
+import { convertToken2URI, copyText, generateOTP } from 'common';
+import { TokenIcon } from 'uikit';
+import { SteamUtils } from 'common';
+import { AppPreference, TokenPreference, EVENT_NAMES, PREF_KEYS } from 'common';
 import { AppStorageV2, SymbolGlyphModifier } from '@kit.ArkUI';
-import { TOTPConfigDialog } from '../dialogs/OTPConfigDialog';
-import { FortiConfigDialog } from '../dialogs/FortiConfigDialog';
-import { SteamConfigDialog } from '../dialogs/SteamConfigDialog';
-import { QRCodeDialog } from '../dialogs/QRCodeDialog';
-import { AppWindowInfo } from '../entryability/EntryAbility';
-import { TokenStore } from '../utils/TokenStore';
+import { TOTPConfigDialog } from 'uikit';
+import { FortiConfigDialog } from 'uikit';
+import { SteamConfigDialog } from 'uikit';
+import { QRCodeDialog } from 'uikit';
+import { AppWindowInfo } from 'common';
+import { TokenStore } from 'common';
 import { ConfigurationConstant, common } from '@kit.AbilityKit';
 import {
   HdsListItemCard,
   PrefixCustomBuilder,
   SuffixCustomBuilder
 } from '@kit.UIDesignKit';
-import { CommonConstants } from '../utils/CommonConstants';
-import { AppFonts } from '../utils/AppFonts';
+import { CommonConstants } from 'common';
+import { AppFonts } from 'common';
 
 let current_token_hide_map: Map<string, boolean> = new Map();
 let tkStore = TokenStore.getInstance();

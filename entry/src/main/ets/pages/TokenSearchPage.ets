@@ -1,17 +1,17 @@
 import { TokenItem } from "../components/TokenItem";
 import { PageScaffold } from "../components/PageScaffold";
-import { FortiConfigDialog } from "../dialogs/FortiConfigDialog";
-import { TOTPConfigDialog } from "../dialogs/OTPConfigDialog";
-import { QRCodeDialog } from "../dialogs/QRCodeDialog";
-import { SteamConfigDialog } from "../dialogs/SteamConfigDialog";
-import { AppPreference, TokenPreference, EVENT_NAMES, PREF_KEYS } from "../utils/AppPreference";
-import { otpType, TokenConfig, TokenConfigVM } from "../utils/TokenConfig";
-import { TokenStore } from "../utils/TokenStore";
-import { convertToken2URI } from "../utils/TokenUtils";
+import { FortiConfigDialog } from 'uikit';
+import { TOTPConfigDialog } from 'uikit';
+import { QRCodeDialog } from 'uikit';
+import { SteamConfigDialog } from 'uikit';
+import { AppPreference, TokenPreference, EVENT_NAMES, PREF_KEYS } from 'common';
+import { otpType, TokenConfig, TokenConfigVM } from 'common';
+import { TokenStore } from 'common';
+import { convertToken2URI } from 'common';
 import { AppStorageV2 } from "@kit.ArkUI";
-import { AppWindowInfo } from "../entryability/EntryAbility";
-import { GenericDataSource } from "../utils/GenericDataSource";
-import { showSnackBar, SnackBarNotifyType } from "../utils/HdsSnackBarUtils";
+import { AppWindowInfo } from 'common';
+import { GenericDataSource } from 'common';
+import { showSnackBar, SnackBarNotifyType } from 'common';
 import { common } from "@kit.AbilityKit";
 import { hilog } from "@kit.PerformanceAnalysisKit";
 import {
@@ -21,7 +21,7 @@ import {
   ScrollEffectType,
   hdsMaterial
 } from "@kit.UIDesignKit";
-import { CommonConstants } from "../utils/CommonConstants";
+import { CommonConstants } from 'common';
 
 let tkStore = TokenStore.getInstance();
 

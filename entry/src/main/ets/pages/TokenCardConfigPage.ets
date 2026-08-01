@@ -1,11 +1,11 @@
-import { TokenConfig, otpType } from '../utils/TokenConfig';
-import { TokenStore } from '../utils/TokenStore';
-import { TokenCardStore, CardConfig } from '../utils/TokenCardStore';
+import { TokenConfig, otpType } from 'common';
+import { TokenStore } from 'common';
+import { TokenCardStore, CardConfig } from 'common';
 import { formProvider, formBindingData } from '@kit.FormKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { AppStorageV2 } from '@kit.ArkUI';
-import { AppWindowInfo } from '../entryability/EntryAbility';
+import { AppWindowInfo } from 'common';
 import { PageScaffold } from '../components/PageScaffold';
 
 @Entry

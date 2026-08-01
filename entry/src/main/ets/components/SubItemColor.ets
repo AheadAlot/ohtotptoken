@@ -1,6 +1,6 @@
 import { ColorSelectDialog } from "../dialogs/ColorSelectDialog";
-import { AppWindowInfo } from "../entryability/EntryAbility";
-import { colorHex } from "../utils/ColorUtils";
+import { AppWindowInfo } from 'common';
+import { colorHex } from 'common';
 import { AppStorageV2 } from "@kit.ArkUI";
 import { SETTING_ROW_MIN_HEIGHT, SETTING_ROW_PADDING } from './SettingStyle';
 

@@ -1,13 +1,13 @@
 import { TokenItem } from "../components/TokenItem";
-import { AppPreference, TokenPreference, EVENT_NAMES } from "../utils/AppPreference";
-import { TokenConfig } from "../utils/TokenConfig";
-import { TokenStore } from "../utils/TokenStore";
-import { GenericDataSource } from "../utils/GenericDataSource";
-import { AppWindowInfo } from "../entryability/EntryAbility";
+import { AppPreference, TokenPreference, EVENT_NAMES } from 'common';
+import { TokenConfig } from 'common';
+import { TokenStore } from 'common';
+import { GenericDataSource } from 'common';
+import { AppWindowInfo } from 'common';
 import { PageScaffold } from "../components/PageScaffold";
 import { AppStorageV2 } from "@kit.ArkUI";
 import { common } from "@kit.AbilityKit";
-import { CommonConstants } from "../utils/CommonConstants";
+import { CommonConstants } from 'common';
 import { hilog } from "@kit.PerformanceAnalysisKit";
 import {
   HdsNavDestination,

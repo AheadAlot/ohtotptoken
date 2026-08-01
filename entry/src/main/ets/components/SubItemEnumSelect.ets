@@ -1,4 +1,4 @@
-import {EnumSelectOption} from '../utils/AppPreference';
+import {EnumSelectOption} from 'common';
 import { SETTING_ROW_MIN_HEIGHT, SETTING_ROW_PADDING } from './SettingStyle';
 
 /**

@@ -1,9 +1,9 @@
 import { SettingItem } from '../../components/SettingItem';
-import { AppWindowInfo } from '../../entryability/EntryAbility';
+import { AppWindowInfo } from 'common';
 import { bundleManager } from '@kit.AbilityKit';
 import { AppStorageV2, curves } from '@kit.ArkUI';
-import { showSnackBar, SnackBarNotifyType } from '../../utils/HdsSnackBarUtils';
-import { AppPreference, PREF_KEYS } from '../../utils/AppPreference';
+import { showSnackBar, SnackBarNotifyType } from 'common';
+import { AppPreference, PREF_KEYS } from 'common';
 import { hdsMaterial, HdsNavigation, HdsNavigationTitleMode, ScrollEffectType } from '@kit.UIDesignKit';
 import { SETTING_PAGE_INSET } from '../../components/SettingStyle';
 

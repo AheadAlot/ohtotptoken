@@ -1,4 +1,4 @@
-import { AppWindowInfo } from "../entryability/EntryAbility";
+import { AppWindowInfo } from 'common';
 import { AppStorageV2 } from "@kit.ArkUI";
 import { SETTING_ROW_MIN_HEIGHT, SETTING_ROW_PADDING } from './SettingStyle';
 

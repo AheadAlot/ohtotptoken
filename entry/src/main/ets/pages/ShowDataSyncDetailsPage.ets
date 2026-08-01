@@ -1,16 +1,16 @@
 import { AppStorageV2 } from '@kit.ArkUI';
 import { TopNavigationView } from '../components/TopNavigationView';
 import { SettingItem } from '../components/SettingItem';
-import { AppPreference, SettingValue, PREF_KEYS } from '../utils/AppPreference';
+import { AppPreference, SettingValue, PREF_KEYS } from 'common';
 import { SubItemButton } from '../components/SubItemButton';
-import { TokenStore } from '../utils/TokenStore';
+import { TokenStore } from 'common';
 import { SubItemDivider } from '../components/SubItemDivider';
-import { AppWindowInfo } from '../entryability/EntryAbility';
+import { AppWindowInfo } from 'common';
 import { PageScaffold } from '../components/PageScaffold';
-import { DeviceInfoHelper,DeviceInfoData } from '../utils/DeviceInfoHelper';
+import { DeviceInfoHelper,DeviceInfoData } from 'common';
 import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit';
-import { CommonConstants } from '../utils/CommonConstants';
-import { showSnackBar, SnackBarNotifyType } from '../utils/HdsSnackBarUtils';
+import { CommonConstants } from 'common';
+import { showSnackBar, SnackBarNotifyType } from 'common';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { SETTING_PAGE_INSET } from '../components/SettingStyle';
 

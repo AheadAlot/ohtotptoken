@@ -1,5 +1,5 @@
 import { AppStorageV2 } from '@kit.ArkUI';
-import { AppWindowInfo } from '../entryability/EntryAbility';
+import { AppWindowInfo } from 'common';
 
 @Builder
 function EmptyBuilder() {

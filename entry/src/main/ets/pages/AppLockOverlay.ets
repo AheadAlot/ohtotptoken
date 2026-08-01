@@ -3,7 +3,7 @@ import { userAuth } from "@kit.UserAuthenticationKit";
 import { BusinessError } from "@kit.BasicServicesKit";
 import { common } from "@kit.AbilityKit";
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { AppPreference, PREF_KEYS } from "../utils/AppPreference";
+import { AppPreference, PREF_KEYS } from 'common';
 
 @ComponentV2
 export struct AppLockOverlay {

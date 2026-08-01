@@ -1,5 +1,5 @@
 import { webview } from '@kit.ArkWeb';
-import { CommonConstants } from '../utils/CommonConstants';
+import { CommonConstants } from 'common';
 import { PageScaffold } from '../components/PageScaffold';
 import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit';
 

@@ -1,10 +1,8 @@
-import { TokenConfig } from '../utils/TokenConfig';
+import { TokenConfig } from 'common';
 import { TokenListPage } from '../pages/TokenListPage';
-// [冷启动优化] ArcTokenListPage 仅在特定断点 (HEIGHT_MD + WIDTH_XS) 的设备上使用
-import lazy { ArcTokenListPage } from '../pages/ArcTokenListPage';
-import { AppWindowInfo } from '../entryability/EntryAbility';
+import { AppWindowInfo } from 'common';
 import { PageScaffold } from '../components/PageScaffold';
-import { ROUTE_NAMES } from '../utils/AppPreference';
+import { ROUTE_NAMES } from 'common';
 import { SymbolGlyphModifier } from '@kit.ArkUI';
 import { HdsNavigation, HdsNavigationTitleMode, HdsTabs, ScrollEffectType, hdsMaterial } from '@kit.UIDesignKit';
 
@@ -15,8 +13,7 @@ function EmptyBuilder() {
 /**
  * 主页签容器(Task 3.1)
  *
- * 承载首页断点 lanes 逻辑:
- *  - HEIGHT_MD + WIDTH_XS(手表等极小屏)→ ArcTokenListPage
+ * 承载首页断点 lanes 逻辑(Phase W 后手表端已拆分为独立 wearable HAP):
  *  - (HEIGHT_MD|HEIGHT_SM) + WIDTH_SM(窄屏)→ 单栏 TokenListPage
  *  - 其余 → HdsTabs 双页签(令牌 / 我的)
  * "我的"页签内容由 SheetCoordinator 通过 settingEntryContent 注入。
@@ -34,7 +31,6 @@ export struct HomeTabs {
   @Require @Param openAddTokenMenu: () => void = () => {};
   @Require @Param addTokenMenuTargetId: string = '';
   @Require @Param tokenListScroller: Scroller = new Scroller();
-  @Require @Param arcTokenListScroller: Scroller = new Scroller();
   @Require @Param settingEntryScroller: Scroller = new Scroller();
 
   @Local tab_bar_index: number = 0;
@@ -45,20 +41,6 @@ export struct HomeTabs {
 
   build() {
     if (
-      (this.window.HeightBreakpoint === HeightBreakpoint.HEIGHT_MD) &&
-        this.window.WidthBreakpoint === WidthBreakpoint.WIDTH_XS
-    ) {
-      ArcTokenListPage({
-        Tokens: this.tokens,
-        TabBarVisible: false,
-        appBottomAvoidHeight: this.window.AvoidBottomHeight,
-        appTopAvoidHeight: this.window.AvoidTopHeight,
-        appWindowSize: this.window.Size,
-        updateTokenConfig: this.updateTokenConfig,
-        updateTokenConfigs: this.updateTokenConfigs,
-        listScroller: this.arcTokenListScroller,
-      })
-    } else if (
       (this.window.HeightBreakpoint === HeightBreakpoint.HEIGHT_MD ||
         this.window.HeightBreakpoint === HeightBreakpoint.HEIGHT_SM) &&
         this.window.WidthBreakpoint === WidthBreakpoint.WIDTH_SM

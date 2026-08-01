@@ -1,0 +1,11 @@
+{
+  "name": "uikit",
+  "version": "1.0.0",
+  "description": "ohtotptoken 基础特性层(手机/手表共享的 ArkUI 组件与弹窗)",
+  "main": "Index.ets",
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "common": "file:../common"
+  }
+}

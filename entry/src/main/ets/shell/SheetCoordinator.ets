@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit';
-import { TokenConfig } from '../utils/TokenConfig';
+import { TokenConfig } from 'common';
 // [冷启动优化] 各 Sheet 仅在用户点击对应入口时触发模块评估
 import lazy { BackupAndMigrationSheet } from '../pages/setting/BackupAndMigrationSheet'
 import lazy { SecuritySheet } from '../pages/setting/SecuritySheet'
@@ -8,12 +8,12 @@ import lazy { DataSyncSheet } from '../pages/setting/DataSyncSheet'
 import lazy { AgreementSheet } from '../pages/setting/AgreementSheet'
 import lazy { AboutSheet } from '../pages/setting/AboutSheet'
 import lazy { FeedbackSheet } from '../pages/setting/FeedbackSheet'
-import { showSnackBar, SnackBarNotifyType } from '../utils/HdsSnackBarUtils';
-import { AppPreference, TokenPreference, EVENT_NAMES, PREF_KEYS } from '../utils/AppPreference';
+import { showSnackBar, SnackBarNotifyType } from 'common';
+import { AppPreference, TokenPreference, EVENT_NAMES, PREF_KEYS } from 'common';
 import { AppStorageV2 } from '@kit.ArkUI';
 import { HdsListItemCard, PrefixIcon, IconSize, SuffixArrow, ScrollEffectType } from '@kit.UIDesignKit';
-import { CommonConstants } from '../utils/CommonConstants';
-import lazy { HuaweiAccountManager, HuaweiUserInfo, HuaweiAccountLoginError } from '../utils/HuaweiAccountManager';
+import { CommonConstants } from 'common';
+import lazy { HuaweiAccountManager, HuaweiUserInfo, HuaweiAccountLoginError } from 'common';
 
 /**
  * Sheet 协调器(Task 3.1)

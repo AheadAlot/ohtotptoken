@@ -1,29 +1,29 @@
 import { bundleManager,common } from '@kit.AbilityKit';
-import { TokenConfig } from '../utils/TokenConfig';
+import { TokenConfig } from 'common';
 import { util, url } from '@kit.ArkTS';
 // [冷启动优化] 文件 I/O 仅在 deferredInit 中使用
 import lazy { fileIo as fs } from '@kit.CoreFileKit';
 import { BusinessError, systemDateTime } from '@kit.BasicServicesKit';
-import { showSnackBar, SnackBarNotifyType } from '../utils/HdsSnackBarUtils';
-import { AppPreference, SettingTopEffectType, SCROLL_EFFECT_TYPE_MAP, EVENT_NAMES, PREF_KEYS, ROUTE_NAMES, BUILTIN_DEFAULT_PACK_ID } from '../utils/AppPreference';
+import { showSnackBar, SnackBarNotifyType } from 'common';
+import { AppPreference, SettingTopEffectType, SCROLL_EFFECT_TYPE_MAP, EVENT_NAMES, PREF_KEYS, ROUTE_NAMES, BUILTIN_DEFAULT_PACK_ID } from 'common';
 // [冷启动优化] privacyManager 仅在 deferredInit 的 GetPrivacyManageInfo 中使用
 import lazy { privacyManager } from '@kit.StoreKit';
 import { hilog, hiTraceMeter } from '@kit.PerformanceAnalysisKit';
 import CommonEventManager from '@ohos.commonEventManager';
-import { TokenStore } from '../utils/TokenStore';
+import { TokenStore } from 'common';
 // [冷启动优化] 权限检查仅在 deferredInit 中使用
-import lazy { PermissionManager } from '../utils/PermissionManager';
+import lazy { PermissionManager } from 'common';
 // [冷启动优化] 拖拽弹框仅在 onDragEnter 时触发
 import lazy { DropFilesDialog } from '../dialogs/DropFilesDialog';
 // [冷启动优化] 加密导入弹框仅在文件拖入 .bak 时触发
 import lazy { EncryptionPassWordDialog } from '../dialogs/EncryptionPassWordDialog';
 // [冷启动优化] 备份恢复仅在文件拖入时触发
-import lazy { restoreFromBackup } from '../utils/TokenBackup';
+import lazy { restoreFromBackup } from 'common';
 // [冷启动优化] TokenIconPacks 仅在 deferredInit 中使用，ScanBarCode 仅在扫码时使用
-import lazy { TokenIconPacks, ScanBarCode } from '../utils/TokenUtils';
+import lazy { TokenIconPacks, ScanBarCode } from 'common';
 // [冷启动优化] 云备份管理器仅在 deferredInit 中使用
-import lazy { CloudBackupManager } from '../utils/CloudBackupManager';
-import { AppWindowInfo } from '../entryability/EntryAbility';
+import lazy { CloudBackupManager } from 'common';
+import { AppWindowInfo } from 'common';
 // [冷启动优化] AppLockOverlay 导入 @kit.CryptoArchitectureKit + @kit.UserAuthenticationKit，
 // bindContentCover 的 Builder 仅在 isAppLockOverlayVisible=true 时评估
 import lazy { AppLockOverlay } from './AppLockOverlay';
@@ -32,13 +32,13 @@ import { ScrollEffectType } from '@kit.UIDesignKit';
 // [冷启动优化] Google Auth 解码仅在扫描迁移链接时使用
 import lazy { decodeProtobuf } from '../utils/GoogleAuthUtils';
 // [冷启动优化] 各添加 Token 弹框仅在用户点击添加时触发评估
-import lazy { TOTPConfigDialog } from '../dialogs/OTPConfigDialog';
-import lazy { FortiConfigDialog } from '../dialogs/FortiConfigDialog';
-import lazy { SteamConfigDialog } from '../dialogs/SteamConfigDialog';
+import lazy { TOTPConfigDialog } from 'uikit';
+import lazy { FortiConfigDialog } from 'uikit';
+import lazy { SteamConfigDialog } from 'uikit';
 // [冷启动优化] 华为账号管理器仅在 deferredInit 中初始化
-import lazy { HuaweiAccountManager } from '../utils/HuaweiAccountManager';
-import lazy { IconPackCloudBackup } from '../utils/IconPackCloudBackup';
-import { DlpAntiPeepManager } from '../utils/DlpAntiPeepManager';
+import lazy { HuaweiAccountManager } from 'common';
+import lazy { IconPackCloudBackup } from 'common';
+import { DlpAntiPeepManager } from 'common';
 import { AppShell } from '../shell/AppShell';
 import { HomeTabs } from '../shell/HomeTabs';
 // [冷启动优化] SheetCoordinator("我的"页签 + 8 个 Sheet)仅在用户切换到"我的"Tab 时触发模块评估
@@ -83,7 +83,6 @@ struct Index {
   @Local window: AppWindowInfo = AppStorageV2.connect(AppWindowInfo) as AppWindowInfo;
   @Local appCtx: common.UIAbilityContext = AppStorage.get('appContext') as common.UIAbilityContext;
   @Local tokenListScroller: Scroller = new Scroller();
-  @Local arcTokenListScroller: Scroller = new Scroller();
   @Local settingEntryScroller: Scroller = new Scroller();
   @Local CurrentTokensCount: number = 0;
   @Local scrollEffectVersion: number = 0;
@@ -739,7 +738,6 @@ struct Index {
       openAddTokenMenu: () => this.openAddTokenMenu(),
       addTokenMenuTargetId: this.addTokenMenuTargetId,
       tokenListScroller: this.tokenListScroller,
-      arcTokenListScroller: this.arcTokenListScroller,
       settingEntryScroller: this.settingEntryScroller,
       settingEntryContent: this.SettingEntryContentBuilder,
     })
