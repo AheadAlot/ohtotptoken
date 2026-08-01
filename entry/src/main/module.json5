@@ -6,6 +6,10 @@
     "mainElement": "EntryAbility",
     "metadata": [
       {
+        "name": "ohos.arkui.UIMaterial.state",
+        "value": "enable"
+      },
+      {
         "name": "appgallery_privacy_hosted",
         "value": "1"
       },

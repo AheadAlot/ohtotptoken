@@ -11,6 +11,7 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { AppPreference, SettingColorMode, PREF_KEYS, EVENT_NAMES } from '../utils/AppPreference';
 import { relationalStore  } from '@kit.ArkData';
 import { DeviceInfoHelper } from '../utils/DeviceInfoHelper';
+import { MaterialPolicy } from '../utils/MaterialPolicy';
 import { DlpAntiPeepManager } from '../utils/DlpAntiPeepManager';
 import { formInfo } from '@kit.FormKit';
 
@@ -99,6 +100,8 @@ export default class EntryAbility extends UIAbility {
 
     // 初始化设备信息（根据华为文档，建议只调用一次）
     DeviceInfoHelper.getInstance().init();
+    // 初始化材质策略（API 26 沉浸光感能力检测与回退档位判定）
+    MaterialPolicy.getInstance().init();
 
     //监听前后台变化
     let applicationStateChangeCallback: ApplicationStateChangeCallback = {
