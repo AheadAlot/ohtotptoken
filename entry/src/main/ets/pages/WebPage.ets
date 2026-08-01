@@ -1,5 +1,6 @@
 import { webview } from '@kit.ArkWeb';
 import { CommonConstants } from '../utils/CommonConstants';
+import { PageScaffold } from '../components/PageScaffold';
 import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit';
 
 @ObservedV2
@@ -23,7 +24,7 @@ export struct WebPage {
 
   build() {
     HdsNavDestination() {
-      Column() {
+      PageScaffold() {
         Web({ controller: this.webViewController, src: this.pageParams.url })
           .darkMode(WebDarkMode.Auto)
           .domStorageAccess(true)
@@ -34,9 +35,6 @@ export struct WebPage {
           .width(CommonConstants.FULL_PERCENT)
           .height(CommonConstants.FULL_PERCENT)
       }
-      .width(CommonConstants.FULL_PERCENT)
-      .height(CommonConstants.FULL_PERCENT)
-      .backgroundColor($r('app.color.window_background'))
     }
     .titleMode(HdsNavDestinationTitleMode.MODAL)
     .titleBar({

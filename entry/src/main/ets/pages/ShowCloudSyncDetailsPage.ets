@@ -5,6 +5,7 @@ import { AppPreference, SettingValue, PREF_KEYS, ROUTE_NAMES } from '../utils/Ap
 import { SubItemButton } from '../components/SubItemButton';
 import { SubItemDivider } from '../components/SubItemDivider';
 import { AppWindowInfo } from '../entryability/EntryAbility';
+import { PageScaffold } from '../components/PageScaffold';
 import { showSnackBar, SnackBarNotifyType } from '../utils/HdsSnackBarUtils';
 import { CloudBackupManager } from '../utils/CloudBackupManager';
 import { HuaweiAccountManager } from '../utils/HuaweiAccountManager';
@@ -160,7 +161,7 @@ export struct ShowCloudSyncDetailsPage {
 
   build() {
     HdsNavDestination() {
-      Column() {
+      PageScaffold() {
         RelativeContainer() {
           Stack() {
             if (this.Is_loaded) {
@@ -464,9 +465,6 @@ export struct ShowCloudSyncDetailsPage {
           }
         }
       }
-      .width('100%')
-      .height('100%')
-      .backgroundColor($r('app.color.window_background'))
     }
     .bindToScrollable([this.scroller])
     .titleMode(HdsNavDestinationTitleMode.MODAL)

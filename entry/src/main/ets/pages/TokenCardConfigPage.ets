@@ -6,6 +6,7 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { AppStorageV2 } from '@kit.ArkUI';
 import { AppWindowInfo } from '../entryability/EntryAbility';
+import { PageScaffold } from '../components/PageScaffold';
 
 @Entry
 @ComponentV2
@@ -41,6 +42,7 @@ export struct TokenCardConfigPage {
 
   build() {
     NavDestination() {
+      PageScaffold() {
       Column() {
         Text(`选择令牌 (最多${this.maxSelect}个)`)
           .fontSize(16)
@@ -83,6 +85,7 @@ export struct TokenCardConfigPage {
       }
       .width('100%')
       .height('100%')
+      }
     }
     .title('配置卡片令牌')
     .hideTitleBar(false)

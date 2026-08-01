@@ -9,7 +9,13 @@ function EmptyBuilder() {
  * 统一页面背景与安全区容器(Task 3.2)
  *
  * 集中管理 app.color.window_background 背景色与状态栏/导航条安全区内边距,
- * 后续各页面逐步迁移到此容器,避免每个页面各自重复设置。
+ * 各 NavDestination 页面的根容器统一使用本组件,避免每个页面各自重复设置。
+ *
+ * 注意:
+ * - 本组件为非滚动容器;内部滚动组件(List/Grid/Scroll)若需在安全区内裁剪,
+ *   请使用滚动组件自身的 clipContent(ContentClipMode.SAFE_AREA);
+ * - 沉浸材质表面由 Phase 2 的 MaterialSurface 承载,本组件保持实体背景作为
+ *   solid 档位回退,不在此处叠加材质。
  */
 @Preview
 @ComponentV2

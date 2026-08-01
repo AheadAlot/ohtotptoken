@@ -1,4 +1,5 @@
 import { TokenItem } from "../components/TokenItem";
+import { PageScaffold } from "../components/PageScaffold";
 import { FortiConfigDialog } from "../dialogs/FortiConfigDialog";
 import { TOTPConfigDialog } from "../dialogs/OTPConfigDialog";
 import { QRCodeDialog } from "../dialogs/QRCodeDialog";
@@ -133,7 +134,7 @@ export struct TokenSearchPage {
 
   build() {
     HdsNavDestination() {
-      Column() {
+      PageScaffold() {
         List({ space: this.token_preference.app_appearance_item_space, scroller: this.searchListScroller }) {
           if (this.dataSource.totalCount() === 0) {
             ListItem() {
@@ -196,9 +197,6 @@ export struct TokenSearchPage {
         .contentStartOffset(this.window.AvoidTopHeight + CommonConstants.AVOID_TOP_WITH_SEARCHBAR_HEIGHT)
         .contentEndOffset(this.window.AvoidBottomHeight)
       }
-      .backgroundColor($r('app.color.window_background'))
-      .width('100%')
-      .height('100%')
     }
     .titleMode(HdsNavDestinationTitleMode.MINI)
     .titleBar({

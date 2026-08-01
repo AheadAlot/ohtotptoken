@@ -3,7 +3,7 @@ import { SettingItem } from '../components/SettingItem';
 import { SubItemDivider } from '../components/SubItemDivider';
 import { SubItemToggle } from '../components/SubItemToggle';
 import { TokenItem } from '../components/TokenItem';
-import { TopNavigationView } from '../components/TopNavigationView';
+import { PageScaffold } from '../components/PageScaffold';
 import { AppPreference, TokenPreference, EVENT_NAMES, PREF_KEYS } from '../utils/AppPreference';
 import { otpType, TokenConfig } from '../utils/TokenConfig';
 import { systemDateTime } from '@kit.BasicServicesKit';
@@ -81,7 +81,7 @@ export struct AppearancePage {
 
   build() {
     HdsNavDestination() {
-      Column() {
+      PageScaffold() {
         Column() {
           List({ space: this.token_preference.app_appearance_item_space, scroller: this.scroller }) {
             // 顶部避让
@@ -573,12 +573,10 @@ export struct AppearancePage {
           .scrollBar(BarState.Off)
 
         }
-        .backgroundColor($r('app.color.window_background'))
+        .padding({ top: 16 })
         .width('100%')
         .height('100%')
       }
-      .padding({ top: 16 })
-      .backgroundColor($r('app.color.window_background'))
     }
     .titleMode(HdsNavDestinationTitleMode.MODAL)
     .titleBar({

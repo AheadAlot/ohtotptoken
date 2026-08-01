@@ -3,6 +3,7 @@ import { CloudBackupManager } from '../utils/CloudBackupManager';
 import { CloudBackupRecord } from '../utils/CloudBackupCrypto';
 import { AppPreference, PREF_KEYS } from '../utils/AppPreference';
 import { AppWindowInfo } from '../entryability/EntryAbility';
+import { PageScaffold } from '../components/PageScaffold';
 import { showSnackBar, SnackBarNotifyType } from '../utils/HdsSnackBarUtils';
 import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit';
 import { CommonConstants } from '../utils/CommonConstants';
@@ -65,7 +66,7 @@ export struct ShowCloudBackupHistoryPage {
 
   build() {
     HdsNavDestination() {
-      Column() {
+      PageScaffold() {
         RelativeContainer() {
           Stack() {
             if (this.isLoading) {
@@ -171,9 +172,6 @@ export struct ShowCloudBackupHistoryPage {
           }
         }
       }
-      .width('100%')
-      .height('100%')
-      .backgroundColor($r('app.color.window_background'))
     }
     .bindToScrollable([this.scroller])
     .titleMode(HdsNavDestinationTitleMode.MODAL)

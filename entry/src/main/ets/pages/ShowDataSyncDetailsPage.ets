@@ -6,6 +6,7 @@ import { SubItemButton } from '../components/SubItemButton';
 import { TokenStore } from '../utils/TokenStore';
 import { SubItemDivider } from '../components/SubItemDivider';
 import { AppWindowInfo } from '../entryability/EntryAbility';
+import { PageScaffold } from '../components/PageScaffold';
 import { DeviceInfoHelper,DeviceInfoData } from '../utils/DeviceInfoHelper';
 import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit';
 import { CommonConstants } from '../utils/CommonConstants';
@@ -42,7 +43,7 @@ export struct ShowDataSyncDetailsPage {
 
   build() {
     HdsNavDestination() {
-      Column() {
+      PageScaffold() {
         RelativeContainer() {
           Stack() {
             if (this.Is_loaded) {
@@ -137,9 +138,6 @@ export struct ShowDataSyncDetailsPage {
           }
         }
       }
-      .width('100%')
-      .height('100%')
-      .backgroundColor($r('app.color.window_background'))
     }
     .bindToScrollable([this.scroller])
     .titleMode(HdsNavDestinationTitleMode.MODAL)
