@@ -5,7 +5,7 @@ import { util, url } from '@kit.ArkTS';
 import lazy { fileIo as fs } from '@kit.CoreFileKit';
 import { BusinessError, systemDateTime } from '@kit.BasicServicesKit';
 import { showSnackBar, SnackBarNotifyType } from 'common';
-import { AppPreference, SettingTopEffectType, SCROLL_EFFECT_TYPE_MAP, EVENT_NAMES, PREF_KEYS, ROUTE_NAMES, BUILTIN_DEFAULT_PACK_ID } from 'common';
+import { AppPreference, SettingTopEffectType, EVENT_NAMES, PREF_KEYS, ROUTE_NAMES, BUILTIN_DEFAULT_PACK_ID } from 'common';
 // [冷启动优化] privacyManager 仅在 deferredInit 的 GetPrivacyManageInfo 中使用
 import lazy { privacyManager } from '@kit.StoreKit';
 import { hilog, hiTraceMeter } from '@kit.PerformanceAnalysisKit';
@@ -45,6 +45,16 @@ import { HomeTabs } from '../shell/HomeTabs';
 import lazy { SheetCoordinator } from '../shell/SheetCoordinator';
 
 const TAG = 'PrivacySubscribe';
+
+
+/** 将SettingTopEffectType映射到ScrollEffectType(自 common/AppPreference 迁入,
+ *  枚举值为 UIDesignKit 运行时符号,手表端不可用,仅手机端使用) */
+const SCROLL_EFFECT_TYPE_MAP: Map<SettingTopEffectType, ScrollEffectType> = new Map([
+  [SettingTopEffectType.COMMON_BLUR, ScrollEffectType.COMMON_BLUR],
+  [SettingTopEffectType.GRADUAL_BLUR, ScrollEffectType.GRADUAL_BLUR],
+  [SettingTopEffectType.GRADIENT_BLUR, ScrollEffectType.GRADIENT_BLUR],
+  [SettingTopEffectType.IMMERSIVE_GRADIENT_BLUR, ScrollEffectType.IMMERSIVE_GRADIENT_BLUR],
+]);
 
 let tkStore = TokenStore.getInstance();
 

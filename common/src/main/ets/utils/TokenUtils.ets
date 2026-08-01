@@ -8,7 +8,7 @@ import { fileIo as fs } from '@kit.CoreFileKit';
 import { readFileContent } from './FileUtils';
 import { fileIo } from '@kit.CoreFileKit';
 import { AppPreference, EVENT_NAMES, BUILTIN_DEFAULT_PACK_ID } from './AppPreference';
-import { showSnackBar, SnackBarNotifyType } from './HdsSnackBarUtils';
+import { showSnackBar, SnackBarNotifyType } from './SnackBar';
 
 const RFC4648 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 const RFC4648_HEX = '0123456789ABCDEFGHIJKLMNOPQRSTUV';

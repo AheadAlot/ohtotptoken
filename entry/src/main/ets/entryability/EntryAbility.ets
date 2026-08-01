@@ -11,8 +11,9 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { AppPreference, SettingColorMode, PREF_KEYS, EVENT_NAMES, AppWindowInfo } from 'common';
 import { relationalStore  } from '@kit.ArkData';
 import { DeviceInfoHelper } from 'common';
-import { MaterialPolicy } from 'common';
+import { MaterialPolicy } from '../utils/MaterialPolicy';
 import { DlpAntiPeepManager } from 'common';
+import { registerHdsSnackBar } from '../utils/HdsSnackBarUtils';
 import { formInfo } from '@kit.FormKit';
 
 //单版本分布式键值数据库
@@ -77,6 +78,7 @@ export default class EntryAbility extends UIAbility {
 
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     AppStorage.setOrCreate("appContext", this.context);
+    registerHdsSnackBar();
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onCreate');
 
     if ((want.parameters!['action'] as string) == 'quick_scan') {

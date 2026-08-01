@@ -1,7 +1,7 @@
 import { TokenImporter } from './TokenImporter';
 import { TokenConfig, otpType } from '../TokenConfig';
 import { showSelectFilePicker, readFileContent } from '../FileUtils';
-import { showSnackBar, SnackBarNotifyType } from '../HdsSnackBarUtils';
+import { showSnackBar, SnackBarNotifyType } from '../SnackBar';
 import { base32Decode } from '../TokenUtils';
 import { HMACAlgorithm } from '../TokenUtils';
 import { util } from '@kit.ArkTS';
