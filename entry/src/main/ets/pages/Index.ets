@@ -616,6 +616,13 @@ struct Index {
         })
         this.dialog_totp_config.open()
       }
+    }).catch((err: BusinessError) => {
+      // 1000500002: 用户取消扫码, 静默处理
+      if (err.code === 1000500002) {
+        return;
+      }
+      hilog.error(0x0000, 'Index', `start_quick_scan failed: ${err.code} ${err.message}`);
+      showSnackBar($r('app.string.toast_scan_failed'), SnackBarNotifyType.ERROR);
     });
   }
 

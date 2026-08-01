@@ -625,6 +625,10 @@
       "value": "Token %s:%s updated"
     },
     {
+      "name": "toast_scan_failed",
+      "value": "Scan failed, please try again"
+    },
+    {
       "name": "toast_multi_token_update",
       "value": "%d token(s) updated"
     },

@@ -14,8 +14,6 @@ const RFC4648 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 const RFC4648_HEX = '0123456789ABCDEFGHIJKLMNOPQRSTUV';
 const CROCKFORD = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 
-let appCtx = AppStorage.get<common.UIAbilityContext>('appContext') as common.UIAbilityContext;
-
 export type Base32Variant = 'RFC3548' | 'RFC4648' | 'RFC4648-HEX' | 'Crockford';
 
 export type HMACAlgorithm = 'SHA1' | 'SHA224' | 'SHA256' | 'SHA384' | 'SHA512' | 'SM3' | 'MD5';
@@ -56,6 +54,11 @@ function doHmacBySync(steps: number, algorithm: HMACAlgorithm, message: string):
 export async function ScanBarCode(): Promise<string> {
   if (canIUse('SystemCapability.Multimedia.Scan.ScanBarcode')) {
     if (canIUse('SystemCapability.Multimedia.Scan.Core')) {
+      // context 必须调用时现取:模块顶层捕获时 AppStorage 尚未注入 appContext
+      const appCtx = AppStorage.get<common.UIAbilityContext>('appContext');
+      if (!appCtx) {
+        throw new Error('appContext not ready');
+      }
       let options: scanBarcode.ScanOptions = {
         scanTypes: [scanCore.ScanType.ALL],
         enableMultiMode: true,

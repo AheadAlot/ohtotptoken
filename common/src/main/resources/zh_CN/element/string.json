@@ -633,6 +633,10 @@
       "value": "令牌 %s:%s 已更新"
     },
     {
+      "name": "toast_scan_failed",
+      "value": "扫码失败，请重试"
+    },
+    {
       "name": "toast_multi_token_update",
       "value": "%d个令牌已更新"
     },
