@@ -1,11 +1,12 @@
-import { TokenConfig, otpType } from '../utils/TokenConfig';
-import { TokenStore } from '../utils/TokenStore';
-import { TokenCardStore, CardConfig } from '../utils/TokenCardStore';
+import { TokenConfig, otpType } from 'common';
+import { TokenStore } from 'common';
+import { TokenCardStore, CardConfig } from 'common';
 import { formProvider, formBindingData } from '@kit.FormKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { AppStorageV2 } from '@kit.ArkUI';
-import { AppWindowInfo } from '../entryability/EntryAbility';
+import { AppWindowInfo } from 'common';
+import { PageScaffold } from '../components/PageScaffold';
 
 @Entry
 @ComponentV2
@@ -41,6 +42,7 @@ export struct TokenCardConfigPage {
 
   build() {
     NavDestination() {
+      PageScaffold() {
       Column() {
         Text(`选择令牌 (最多${this.maxSelect}个)`)
           .fontSize(16)
@@ -83,6 +85,7 @@ export struct TokenCardConfigPage {
       }
       .width('100%')
       .height('100%')
+      }
     }
     .title('配置卡片令牌')
     .hideTitleBar(false)

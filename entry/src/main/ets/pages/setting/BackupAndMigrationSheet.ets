@@ -1,25 +1,26 @@
-import { TokenConfig } from '../../utils/TokenConfig';
+import { TokenConfig } from 'common';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { bundleManager,common } from '@kit.AbilityKit';
-import { convertToken2URI, generateFileNameWithDate } from '../../utils/TokenUtils'
-import { showSnackBar, SnackBarNotifyType } from '../../utils/HdsSnackBarUtils';
+import { convertToken2URI, generateFileNameWithDate } from 'common'
+import { showSnackBar, SnackBarNotifyType } from 'common';
 import { SubItemButton } from '../../components/SubItemButton';
 import { SubItemToggle } from '../../components/SubItemToggle';
 import { SettingItem } from '../../components/SettingItem';
 import { EncryptionPassWordDialog } from '../../dialogs/EncryptionPassWordDialog';
-import { restoreFromBackup, saveBackupToFile, TokenBackup } from '../../utils/TokenBackup';
-import { showSaveFilePicker, showSelectFilePicker, writeFileContent } from '../../utils/FileUtils';
+import { restoreFromBackup, saveBackupToFile, TokenBackup } from 'common';
+import { showSaveFilePicker, showSelectFilePicker, writeFileContent } from 'common';
 import { SubItemDivider } from '../../components/SubItemDivider';
 import { LengthMetrics } from '@kit.ArkUI';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { AppPreference, SettingValue, PREF_KEYS, ROUTE_NAMES } from '../../utils/AppPreference';
-import { throttle } from '../../utils/UiUtils';
+import { AppPreference, SettingValue, PREF_KEYS, ROUTE_NAMES } from 'common';
+import { throttle } from 'common';
 import { ShowCloudSyncDetailsPage } from '../ShowCloudSyncDetailsPage';
 import { ShowCloudBackupHistoryPage } from '../ShowCloudBackupHistoryPage';
-import { HuaweiAccountManager } from '../../utils/HuaweiAccountManager';
+import { HuaweiAccountManager } from 'common';
 import { hdsMaterial, HdsNavigation, HdsNavigationTitleMode, ScrollEffectType } from '@kit.UIDesignKit';
-import { TokenImporterRegistry, TokenImporter } from '../../utils/importers/TokenImporter';
+import { TokenImporterRegistry, TokenImporter } from 'common';
 import { URIConfigDialog } from '../../dialogs/URIConfigDialog';
+import { SETTING_PAGE_INSET } from '../../components/SettingStyle';
 
 @Preview
 @ComponentV2
@@ -272,7 +273,7 @@ export struct BackupAndMigrationSheet {
                   })
               }
             }
-            .padding({ left: 10, right: 10 })
+            .padding({ left: SETTING_PAGE_INSET, right: SETTING_PAGE_INSET })
 
             // 从其他验证器导入
             if (this.importers.length > 0) {
@@ -314,7 +315,7 @@ export struct BackupAndMigrationSheet {
                   }, (importer: TokenImporter) => importer.id)
                 }
               }
-              .padding({ left: 10, right: 10 })
+              .padding({ left: SETTING_PAGE_INSET, right: SETTING_PAGE_INSET })
             }
 
             ListItem() {
@@ -358,7 +359,7 @@ export struct BackupAndMigrationSheet {
                   }, 1000))
               }
             }
-            .padding({ left: 10, right: 10 })
+            .padding({ left: SETTING_PAGE_INSET, right: SETTING_PAGE_INSET })
           }
           .clip(false)
           .width('100%')

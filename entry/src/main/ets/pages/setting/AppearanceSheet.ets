@@ -1,19 +1,20 @@
 import { BusinessError } from '@kit.BasicServicesKit';
-import { showSnackBar, SnackBarNotifyType } from '../../utils/HdsSnackBarUtils';
+import { showSnackBar, SnackBarNotifyType } from 'common';
 import { SubItemToggle } from '../../components/SubItemToggle'
 import { AppStorageV2, curves } from '@kit.ArkUI';
-import { AppPreference, SettingColorMode, SettingTopEffectType, SettingBottomTabsType, TokenPreference, AVAILABLE_TOP_EFFECT_TYPES, AVAILABLE_BOTTOM_TABS_TYPES, EVENT_NAMES, PREF_KEYS, ROUTE_NAMES } from '../../utils/AppPreference';
+import { AppPreference, SettingColorMode, SettingTopEffectType, SettingBottomTabsType, TokenPreference, AVAILABLE_TOP_EFFECT_TYPES, AVAILABLE_BOTTOM_TABS_TYPES, EVENT_NAMES, PREF_KEYS, ROUTE_NAMES } from 'common';
 import { SubItemButton } from '../../components/SubItemButton';
 import { SettingItem } from '../../components/SettingItem';
 import { SubItemDivider } from '../../components/SubItemDivider';
 import { SubItemSelect } from '../../components/SubItemSelect';
 import { SubItemEnumSelect } from '../../components/SubItemEnumSelect';
 import { SubItemIconManager } from '../../components/SubItemIconManager';
-import { AppWindowInfo } from '../../entryability/EntryAbility';
+import { AppWindowInfo } from 'common';
 import { common, ConfigurationConstant } from '@kit.AbilityKit';
-import { throttle } from '../../utils/UiUtils';
+import { throttle } from 'common';
 import { AppearancePage } from '../AppearancePage';
 import { hdsMaterial, HdsNavigation, HdsNavigationTitleMode, ScrollEffectType } from '@kit.UIDesignKit';
+import { SETTING_PAGE_INSET } from '../../components/SettingStyle';
 
 @Preview
 @ComponentV2
@@ -119,11 +120,9 @@ export struct AppearanceSheet {
                   .onClick(throttle((event) => {
                     this.pageInfos.pushPathByName(ROUTE_NAMES.AppearancePage, null);
                   }, 1000))
-
-                SubItemDivider()
               }
             }
-            .padding({ left: 10, right: 10 })
+            .padding({ left: SETTING_PAGE_INSET, right: SETTING_PAGE_INSET })
           }
           .clip(false)
           .width('100%')

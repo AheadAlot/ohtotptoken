@@ -1,7 +1,7 @@
-import { ScanBarCode } from "../utils/TokenUtils";
+import { ScanBarCode } from 'common';
 import { url } from "@kit.ArkTS";
-import { otpType, TokenConfig } from "../utils/TokenConfig";
-import { readFileContent, showSelectFilePicker } from "../utils/FileUtils";
+import { otpType, TokenConfig } from 'common';
+import { readFileContent, showSelectFilePicker } from 'common';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 
 @Preview

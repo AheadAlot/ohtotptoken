@@ -1,6 +1,6 @@
 import { BackupExtensionAbility, BundleVersion } from '@kit.CoreFileKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { performBackup, performRestore } from '../utils/BackupRestoreHelper';
+import { performBackup, performRestore } from 'common';
 
 const TAG = 'EntryBackupAbility';
 

@@ -1,10 +1,10 @@
 import { decode_google_auth_pb } from "libotpcutils.so";
 import { googleauth } from './google_auth.js'
-import { otpType, TokenConfig } from "./TokenConfig";
+import { otpType, TokenConfig } from "common";
 import { JSON } from "@kit.ArkTS";
-import { HMACAlgorithm } from "./TokenUtils";
-import { Base64Util }  from './Base64Util';
-import { base32Decode, base32Encode,stringToArray } from './TokenUtils';
+import { HMACAlgorithm } from "common";
+import { Base64Util }  from 'common';
+import { base32Decode, base32Encode,stringToArray } from 'common';
 import { hiTraceMeter, hilog } from '@kit.PerformanceAnalysisKit';
 import Long from "long";
 

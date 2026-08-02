@@ -6,6 +6,10 @@
     "mainElement": "EntryAbility",
     "metadata": [
       {
+        "name": "ohos.arkui.UIMaterial.state",
+        "value": "enable"
+      },
+      {
         "name": "appgallery_privacy_hosted",
         "value": "1"
       },
@@ -25,8 +29,7 @@
     "deviceTypes": [
       "phone",
       "tablet",
-      "2in1",
-      "wearable"
+      "2in1"
     ],
     "requestPermissions": [
       {

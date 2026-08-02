@@ -1,16 +1,17 @@
 import { TokenItem } from "../components/TokenItem";
-import { FortiConfigDialog } from "../dialogs/FortiConfigDialog";
-import { TOTPConfigDialog } from "../dialogs/OTPConfigDialog";
-import { QRCodeDialog } from "../dialogs/QRCodeDialog";
-import { SteamConfigDialog } from "../dialogs/SteamConfigDialog";
-import { AppPreference, TokenPreference, EVENT_NAMES, PREF_KEYS } from "../utils/AppPreference";
-import { otpType, TokenConfig, TokenConfigVM } from "../utils/TokenConfig";
-import { TokenStore } from "../utils/TokenStore";
-import { convertToken2URI } from "../utils/TokenUtils";
+import { PageScaffold } from "../components/PageScaffold";
+import { FortiConfigDialog } from 'uikit';
+import { TOTPConfigDialog } from 'uikit';
+import { QRCodeDialog } from 'uikit';
+import { SteamConfigDialog } from 'uikit';
+import { AppPreference, TokenPreference, EVENT_NAMES, PREF_KEYS } from 'common';
+import { otpType, TokenConfig, TokenConfigVM } from 'common';
+import { TokenStore } from 'common';
+import { convertToken2URI } from 'common';
 import { AppStorageV2 } from "@kit.ArkUI";
-import { AppWindowInfo } from "../entryability/EntryAbility";
-import { GenericDataSource } from "../utils/GenericDataSource";
-import { showSnackBar, SnackBarNotifyType } from "../utils/HdsSnackBarUtils";
+import { AppWindowInfo } from 'common';
+import { GenericDataSource } from 'common';
+import { showSnackBar, SnackBarNotifyType } from 'common';
 import { common } from "@kit.AbilityKit";
 import { hilog } from "@kit.PerformanceAnalysisKit";
 import {
@@ -20,7 +21,7 @@ import {
   ScrollEffectType,
   hdsMaterial
 } from "@kit.UIDesignKit";
-import { CommonConstants } from "../utils/CommonConstants";
+import { CommonConstants } from 'common';
 
 let tkStore = TokenStore.getInstance();
 
@@ -133,7 +134,7 @@ export struct TokenSearchPage {
 
   build() {
     HdsNavDestination() {
-      Column() {
+      PageScaffold() {
         List({ space: this.token_preference.app_appearance_item_space, scroller: this.searchListScroller }) {
           if (this.dataSource.totalCount() === 0) {
             ListItem() {
@@ -196,9 +197,6 @@ export struct TokenSearchPage {
         .contentStartOffset(this.window.AvoidTopHeight + CommonConstants.AVOID_TOP_WITH_SEARCHBAR_HEIGHT)
         .contentEndOffset(this.window.AvoidBottomHeight)
       }
-      .backgroundColor($r('app.color.window_background'))
-      .width('100%')
-      .height('100%')
     }
     .titleMode(HdsNavDestinationTitleMode.MINI)
     .titleBar({

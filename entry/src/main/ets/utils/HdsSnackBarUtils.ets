@@ -8,15 +8,8 @@ import {
   SnackBarOperationType,
   SnackBarStyleOptions
 } from '@kit.UIDesignKit';
-import { AppWindowInfo } from '../entryability/EntryAbility';
+import { AppWindowInfo, SnackBarNotifyType, SnackBarNotifyOptions, setSnackBarImpl } from 'common';
 import { common, ConfigurationConstant } from '@kit.AbilityKit';
-
-export enum SnackBarNotifyType {
-  INFO = 'INFO',
-  WARNING = 'WARNING',
-  ERROR = 'ERROR',
-  SUCCESS = 'SUCCESS'
-}
 
 const SnackBarIconMap: Record<SnackBarNotifyType, ResourceStr | undefined> = {
   [SnackBarNotifyType.INFO]: $r('sys.symbol.info_circle'),
@@ -51,12 +44,7 @@ function getUiAbilityContext(): common.UIAbilityContext | undefined {
   return windowInfo.Context;
 }
 
-export interface SnackBarNotifyOptions {
-  title?: ResourceStr;
-  duration?: number;
-}
-
-export function showSnackBar(
+function showHdsSnackBar(
   message: ResourceStr,
   type: SnackBarNotifyType = SnackBarNotifyType.INFO,
   options: SnackBarNotifyOptions = {}
@@ -95,4 +83,12 @@ export function showSnackBar(
     : undefined;
 
   snackBar.show(iconOptions, messageOptions, operationOptions, styleOptions);
+}
+
+/**
+ * 将 common 的 showSnackBar 端口注入为 HDS 实现。
+ * 需在 EntryAbility.onCreate 调用一次(手机端 HDS 环境,UIDesignKit 可用)。
+ */
+export function registerHdsSnackBar(): void {
+  setSnackBarImpl(showHdsSnackBar);
 }

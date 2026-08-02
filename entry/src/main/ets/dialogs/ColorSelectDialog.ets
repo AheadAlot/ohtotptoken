@@ -1,5 +1,5 @@
-import { AppPreference, PREF_KEYS } from "../utils/AppPreference";
-import { colorHex, hexColor, mixRgba, scaleRgba, setRgba } from "../utils/ColorUtils";
+import { AppPreference, PREF_KEYS } from 'common';
+import { colorHex, hexColor, mixRgba, scaleRgba, setRgba } from 'common';
 
 @Preview
 @CustomDialog

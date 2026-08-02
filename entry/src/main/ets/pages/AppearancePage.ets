@@ -3,17 +3,18 @@ import { SettingItem } from '../components/SettingItem';
 import { SubItemDivider } from '../components/SubItemDivider';
 import { SubItemToggle } from '../components/SubItemToggle';
 import { TokenItem } from '../components/TokenItem';
-import { TopNavigationView } from '../components/TopNavigationView';
-import { AppPreference, TokenPreference, EVENT_NAMES, PREF_KEYS } from '../utils/AppPreference';
-import { otpType, TokenConfig } from '../utils/TokenConfig';
+import { PageScaffold } from '../components/PageScaffold';
+import { AppPreference, TokenPreference, EVENT_NAMES, PREF_KEYS } from 'common';
+import { otpType, TokenConfig } from 'common';
 import { systemDateTime } from '@kit.BasicServicesKit';
 import { SubItemColor } from '../components/SubItemColor';
 import { SubItemSlider } from '../components/SubItemSlider';
 import { SubItemButton } from '../components/SubItemButton';
-import { AppWindowInfo } from '../entryability/EntryAbility';
+import { AppWindowInfo } from 'common';
 import { common } from '@kit.AbilityKit';
 import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit';
-import { CommonConstants } from '../utils/CommonConstants';
+import { CommonConstants } from 'common';
+import { SETTING_PAGE_INSET } from '../components/SettingStyle';
 
 @Entry
 @Preview
@@ -81,7 +82,7 @@ export struct AppearancePage {
 
   build() {
     HdsNavDestination() {
-      Column() {
+      PageScaffold() {
         Column() {
           List({ space: this.token_preference.app_appearance_item_space, scroller: this.scroller }) {
             // 顶部避让
@@ -206,7 +207,7 @@ export struct AppearancePage {
                 })
               }
             }
-            .padding({ left: 10, right: 10 })
+            .padding({ left: SETTING_PAGE_INSET, right: SETTING_PAGE_INSET })
 
             ListItem() {
               SettingItem({ title: $r('app.string.custom_layout') }) {
@@ -406,7 +407,7 @@ export struct AppearancePage {
 
               }
             }
-            .padding({ left: 10, right: 10 })
+            .padding({ left: SETTING_PAGE_INSET, right: SETTING_PAGE_INSET })
 
             ListItem() {
               SettingItem({ title: $r('app.string.custom_decoration_color') }) {
@@ -549,7 +550,7 @@ export struct AppearancePage {
                 })
               }
             }
-            .padding({ left: 10, right: 10 })
+            .padding({ left: SETTING_PAGE_INSET, right: SETTING_PAGE_INSET })
 
             ListItem() {
               SettingItem({ title: $r('app.string.custom_appearance_cmd') }) {
@@ -562,7 +563,7 @@ export struct AppearancePage {
                   })
               }
             }
-            .padding({ left: 10, right: 10 })
+            .padding({ left: SETTING_PAGE_INSET, right: SETTING_PAGE_INSET })
 
             ListItem()
               .height(this.window.AvoidBottomHeight + 56) // 56: navigation_height
@@ -573,12 +574,10 @@ export struct AppearancePage {
           .scrollBar(BarState.Off)
 
         }
-        .backgroundColor($r('app.color.window_background'))
+        .padding({ top: 16 })
         .width('100%')
         .height('100%')
       }
-      .padding({ top: 16 })
-      .backgroundColor($r('app.color.window_background'))
     }
     .titleMode(HdsNavDestinationTitleMode.MODAL)
     .titleBar({

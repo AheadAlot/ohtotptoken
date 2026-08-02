@@ -1,18 +1,19 @@
 import { AppStorageV2, LengthMetrics } from '@kit.ArkUI';
-import { CloudBackupManager } from '../utils/CloudBackupManager';
-import { CloudBackupRecord } from '../utils/CloudBackupCrypto';
-import { AppPreference, PREF_KEYS } from '../utils/AppPreference';
-import { AppWindowInfo } from '../entryability/EntryAbility';
-import { showSnackBar, SnackBarNotifyType } from '../utils/HdsSnackBarUtils';
+import { CloudBackupManager } from 'common';
+import { CloudBackupRecord } from 'common';
+import { AppPreference, PREF_KEYS } from 'common';
+import { AppWindowInfo } from 'common';
+import { PageScaffold } from '../components/PageScaffold';
+import { showSnackBar, SnackBarNotifyType } from 'common';
 import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit';
-import { CommonConstants } from '../utils/CommonConstants';
-import { DeviceInfoHelper } from '../utils/DeviceInfoHelper';
-import { SyncTimeHelper } from '../utils/SyncTimeHelper';
+import { CommonConstants } from 'common';
+import { DeviceInfoHelper } from 'common';
+import { SyncTimeHelper } from 'common';
 import { common } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { taskpool } from '@kit.ArkTS';
-import { loadBackupHistoryRecords } from '../utils/CloudSyncTask';
+import { loadBackupHistoryRecords } from 'common';
 
 const TAG = 'ShowCloudBackupHistoryPage';
 const DOMAIN = 0xFF00;
@@ -65,7 +66,7 @@ export struct ShowCloudBackupHistoryPage {
 
   build() {
     HdsNavDestination() {
-      Column() {
+      PageScaffold() {
         RelativeContainer() {
           Stack() {
             if (this.isLoading) {
@@ -171,9 +172,6 @@ export struct ShowCloudBackupHistoryPage {
           }
         }
       }
-      .width('100%')
-      .height('100%')
-      .backgroundColor($r('app.color.window_background'))
     }
     .bindToScrollable([this.scroller])
     .titleMode(HdsNavDestinationTitleMode.MODAL)

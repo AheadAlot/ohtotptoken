@@ -1,7 +1,8 @@
 import { AppStorageV2 } from '@kit.ArkUI';
 import { TopNavigationView } from '../components/TopNavigationView';
-import { TokenConfig } from '../utils/TokenConfig';
-import { AppWindowInfo } from '../entryability/EntryAbility';
+import { TokenConfig } from 'common';
+import { AppWindowInfo } from 'common';
+import { PageScaffold } from '../components/PageScaffold';
 
 @Entry
 @ComponentV2
@@ -16,7 +17,7 @@ export struct ShowCodePage {
 
   build() {
     NavDestination() {
-    Column() {
+    PageScaffold() {
       TopNavigationView({
         title: '',
         onBackClick: () => {
@@ -35,9 +36,6 @@ export struct ShowCodePage {
       }
 
     }
-    .width('100%')
-    .height('100%')
-    .backgroundColor($r('app.color.window_background'))
     }
     .hideTitleBar(true, true)
     .onReady((context: NavDestinationContext) => {

@@ -1,79 +1,60 @@
 import { bundleManager,common } from '@kit.AbilityKit';
-import { TokenConfig } from '../utils/TokenConfig';
-// [冷启动优化] Setting 相关组件：仅在用户切换到"我的"Tab 或打开 Sheet 时才触发模块评估
-import lazy { SettingPage } from '../pages/setting/SettingPage'
-import lazy { BackupAndMigrationSheet } from '../pages/setting/BackupAndMigrationSheet'
-import lazy { SecuritySheet } from '../pages/setting/SecuritySheet'
-import lazy { AppearanceSheet } from '../pages/setting/AppearanceSheet'
-import lazy { DataSyncSheet } from '../pages/setting/DataSyncSheet'
-import lazy { AgreementSheet } from '../pages/setting/AgreementSheet'
-import lazy { AboutSheet } from '../pages/setting/AboutSheet'
-import lazy { FeedbackSheet } from '../pages/setting/FeedbackSheet'
-// [冷启动优化] NavDestination 子页面：仅在用户导航时触发评估
-import lazy { TokenCardConfigPage } from './TokenCardConfigPage'
-import lazy { TokenSortPage } from './TokenSortPage'
-import lazy { TokenSearchPage } from './TokenSearchPage'
+import { TokenConfig } from 'common';
 import { util, url } from '@kit.ArkTS';
 // [冷启动优化] 文件 I/O 仅在 deferredInit 中使用
 import lazy { fileIo as fs } from '@kit.CoreFileKit';
 import { BusinessError, systemDateTime } from '@kit.BasicServicesKit';
-import { showSnackBar, SnackBarNotifyType } from '../utils/HdsSnackBarUtils';
-import { AppPreference, TokenPreference, SettingTopEffectType, SettingBottomTabsType, SCROLL_EFFECT_TYPE_MAP, EVENT_NAMES, PREF_KEYS, ROUTE_NAMES, BUILTIN_DEFAULT_PACK_ID } from '../utils/AppPreference';
+import { showSnackBar, SnackBarNotifyType } from 'common';
+import { AppPreference, SettingTopEffectType, EVENT_NAMES, PREF_KEYS, ROUTE_NAMES, BUILTIN_DEFAULT_PACK_ID } from 'common';
 // [冷启动优化] privacyManager 仅在 deferredInit 的 GetPrivacyManageInfo 中使用
 import lazy { privacyManager } from '@kit.StoreKit';
 import { hilog, hiTraceMeter } from '@kit.PerformanceAnalysisKit';
 import CommonEventManager from '@ohos.commonEventManager';
-import { TokenStore } from '../utils/TokenStore';
+import { TokenStore } from 'common';
 // [冷启动优化] 权限检查仅在 deferredInit 中使用
-import lazy { PermissionManager } from '../utils/PermissionManager';
+import lazy { PermissionManager } from 'common';
 // [冷启动优化] 拖拽弹框仅在 onDragEnter 时触发
 import lazy { DropFilesDialog } from '../dialogs/DropFilesDialog';
-import { uniformTypeDescriptor } from '@kit.ArkData';
 // [冷启动优化] 加密导入弹框仅在文件拖入 .bak 时触发
 import lazy { EncryptionPassWordDialog } from '../dialogs/EncryptionPassWordDialog';
 // [冷启动优化] 备份恢复仅在文件拖入时触发
-import lazy { restoreFromBackup } from '../utils/TokenBackup';
+import lazy { restoreFromBackup } from 'common';
 // [冷启动优化] TokenIconPacks 仅在 deferredInit 中使用，ScanBarCode 仅在扫码时使用
-import lazy { TokenIconPacks, ScanBarCode } from '../utils/TokenUtils';
-
+import lazy { TokenIconPacks, ScanBarCode } from 'common';
 // [冷启动优化] 云备份管理器仅在 deferredInit 中使用
-import lazy { CloudBackupManager } from '../utils/CloudBackupManager';
-import { TokenListPage } from './TokenListPage';
-// [冷启动优化] 以下 NavDestination 页面仅在用户导航时触发评估
-import lazy { AppearancePage } from './AppearancePage';
-import lazy { ShowDataSyncDetailsPage } from './ShowDataSyncDetailsPage';
-import lazy { ShowCloudSyncDetailsPage } from './ShowCloudSyncDetailsPage';
-import lazy { ShowCloudBackupHistoryPage } from './ShowCloudBackupHistoryPage';
-import lazy { ShowCodePage } from './ShowCodePage';
-// [冷启动优化] WebPage 导入 @kit.ArkWeb (libwebview_napi.z.so ~10ms)，延迟到用户实际访问网页时
-import lazy { WebPage, WebPageParams } from './WebPage';
-import { AppWindowInfo } from '../entryability/EntryAbility';
+import lazy { CloudBackupManager } from 'common';
+import { AppWindowInfo } from 'common';
 // [冷启动优化] AppLockOverlay 导入 @kit.CryptoArchitectureKit + @kit.UserAuthenticationKit，
 // bindContentCover 的 Builder 仅在 isAppLockOverlayVisible=true 时评估
 import lazy { AppLockOverlay } from './AppLockOverlay';
-import { AppStorageV2, ComponentContent, SymbolGlyphModifier, window } from '@kit.ArkUI';
-import { HdsNavigation, HdsNavigationTitleMode, HdsTabs,
-  ScrollEffectType, HdsListItemCard,
-  PrefixIcon,
-  IconSize,
-  SuffixArrow,
-  hdsMaterial} from '@kit.UIDesignKit';
-// [冷启动优化] ArcTokenListPage 仅在特定断点 (HEIGHT_MD + WIDTH_XS) 的设备上使用
-import lazy { ArcTokenListPage } from './ArcTokenListPage';
-import { LengthMetrics } from '@kit.ArkUI';
+import { AppStorageV2, ComponentContent, window } from '@kit.ArkUI';
+import { ScrollEffectType } from '@kit.UIDesignKit';
 // [冷启动优化] Google Auth 解码仅在扫描迁移链接时使用
 import lazy { decodeProtobuf } from '../utils/GoogleAuthUtils';
 // [冷启动优化] 各添加 Token 弹框仅在用户点击添加时触发评估
-import lazy { TOTPConfigDialog } from '../dialogs/OTPConfigDialog';
-import lazy { FortiConfigDialog } from '../dialogs/FortiConfigDialog';
-import lazy { SteamConfigDialog } from '../dialogs/SteamConfigDialog';
-import { CommonConstants } from '../utils/CommonConstants';
+import lazy { TOTPConfigDialog } from 'uikit';
+import lazy { FortiConfigDialog } from 'uikit';
+import lazy { SteamConfigDialog } from 'uikit';
 // [冷启动优化] 华为账号管理器仅在 deferredInit 中初始化
-import lazy { HuaweiAccountManager, HuaweiUserInfo, HuaweiAccountLoginError } from '../utils/HuaweiAccountManager';
-import lazy { IconPackCloudBackup } from '../utils/IconPackCloudBackup';
-import { DlpAntiPeepManager } from '../utils/DlpAntiPeepManager';
+import lazy { HuaweiAccountManager } from 'common';
+import lazy { IconPackCloudBackup } from 'common';
+import { DlpAntiPeepManager } from 'common';
+import { AppShell } from '../shell/AppShell';
+import { HomeTabs } from '../shell/HomeTabs';
+// [冷启动优化] SheetCoordinator("我的"页签 + 8 个 Sheet)仅在用户切换到"我的"Tab 时触发模块评估
+import lazy { SheetCoordinator } from '../shell/SheetCoordinator';
 
 const TAG = 'PrivacySubscribe';
+
+
+/** 将SettingTopEffectType映射到ScrollEffectType(自 common/AppPreference 迁入,
+ *  枚举值为 UIDesignKit 运行时符号,手表端不可用,仅手机端使用) */
+const SCROLL_EFFECT_TYPE_MAP: Map<SettingTopEffectType, ScrollEffectType> = new Map([
+  [SettingTopEffectType.COMMON_BLUR, ScrollEffectType.COMMON_BLUR],
+  [SettingTopEffectType.GRADUAL_BLUR, ScrollEffectType.GRADUAL_BLUR],
+  [SettingTopEffectType.GRADIENT_BLUR, ScrollEffectType.GRADIENT_BLUR],
+  [SettingTopEffectType.IMMERSIVE_GRADIENT_BLUR, ScrollEffectType.IMMERSIVE_GRADIENT_BLUR],
+]);
 
 let tkStore = TokenStore.getInstance();
 
@@ -107,31 +88,15 @@ function TokenAddMenuBuilder(host: Index) {
 @ComponentV2
 struct Index {
   @Local CurrentTokens: TokenConfig[] = [];
-  @Local tab_bar_index: number = 0;
   @Local token_loading: Boolean = true;
   @Local background_blur_flag: Boolean = false;
   @Local window: AppWindowInfo = AppStorageV2.connect(AppWindowInfo) as AppWindowInfo;
   @Local appCtx: common.UIAbilityContext = AppStorage.get('appContext') as common.UIAbilityContext;
   @Local tokenListScroller: Scroller = new Scroller();
-  @Local arcTokenListScroller: Scroller = new Scroller();
   @Local settingEntryScroller: Scroller = new Scroller();
-  @Local isSettingSheetVisible: boolean = false;
-  @Local isBackupSheetVisible: boolean = false;
-  @Local isSafetySheetVisible: boolean = false;
-  @Local isAppearanceSheetVisible: boolean = false;
-  @Local isDataSyncSheetVisible: boolean = false;
-  @Local isAgreementSheetVisible: boolean = false;
-  @Local isAboutSheetVisible: boolean = false;
-  @Local isFeedbackSheetVisible: boolean = false;
-  @Local isHuaweiLoggedIn: boolean = false;
-  @Local huaweiUser: HuaweiUserInfo | null = null;
-  @Local isAccountSheetVisible: boolean = false;
-  @Local token_preference: TokenPreference = AppStorageV2.connect(TokenPreference) as TokenPreference;
   @Local CurrentTokensCount: number = 0;
   @Local scrollEffectVersion: number = 0;
   @Local isAppLockOverlayVisible: boolean = false;
-  // 冷启动优化：Setting Tab 懒加载标志，仅在用户首次切换到"我的"Tab 时构建组件树
-  @Local settingTabInitialized: boolean = false;
   pageInfos: NavPathStack = new NavPathStack();
 
   /**
@@ -305,7 +270,10 @@ struct Index {
     hiTraceMeter.startTrace('H:deferredInit.accountInit', 1);
     HuaweiAccountManager.getInstance().init().then(() => {
       hiTraceMeter.finishTrace('H:deferredInit.accountInit', 1);
-      this.syncHuaweiAccountState();
+      // 账号 UI 状态由 SheetCoordinator 持有，广播事件通知其重新同步
+      if (this.appCtx.eventHub != undefined) {
+        this.appCtx.eventHub.emit(EVENT_NAMES.HUAWEI_ACCOUNT_STATE_CHANGED);
+      }
       CloudBackupManager.getInstance().checkAndAutoBackup();
     }).catch((err: BusinessError) => {
       hiTraceMeter.finishTrace('H:deferredInit.accountInit', 1);
@@ -596,70 +564,6 @@ struct Index {
     }
   }
 
-  private syncHuaweiAccountState(): void {
-    this.isHuaweiLoggedIn = HuaweiAccountManager.getInstance().userLogin;
-    this.huaweiUser = HuaweiAccountManager.getInstance().userAccount;
-  }
-
-  private async triggerHuaweiLogin(): Promise<void> {
-    try {
-      const result = await HuaweiAccountManager.getInstance().login(this.getUIContext());
-      this.syncHuaweiAccountState();
-      this.isAccountSheetVisible = true;
-    } catch (error) {
-      this.syncHuaweiAccountState();
-      const loginError = error as HuaweiAccountLoginError;
-      if (HuaweiAccountManager.isUserCancel(loginError.code)) {
-        return;
-      }
-      const errorMsg = HuaweiAccountManager.getLoginErrorResource(loginError.code);
-      if (errorMsg) {
-        showSnackBar(errorMsg, SnackBarNotifyType.ERROR);
-      }
-    }
-  }
-
-  private confirmHuaweiLogin(): void {
-    HuaweiAccountManager.getInstance().selectHuaweiAccountToLogin();
-    this.syncHuaweiAccountState();
-    this.isAccountSheetVisible = false;
-    showSnackBar($r('app.string.huawei_account_login_success'), SnackBarNotifyType.SUCCESS);
-  }
-
-  private showLogoutConfirmDialog(): void {
-    const cloudBackupEnabled = AppPreference.getPreference(PREF_KEYS.APPEARANCE_HUAWEI_CLOUD_SYNC_ENABLE) as boolean;
-    const msg = cloudBackupEnabled
-      ? $r('app.string.huawei_account_logout_cloud_backup_msg')
-      : $r('app.string.huawei_account_logout_confirm_msg');
-    this.getUIContext().showAlertDialog({
-      title: $r('app.string.huawei_account_logout_confirm_title'),
-      message: msg,
-      autoCancel: true,
-      alignment: DialogAlignment.Bottom,
-      gridCount: 4,
-      offset: { dx: 0, dy: -20 },
-      buttonDirection: DialogButtonDirection.HORIZONTAL,
-      buttons: [
-        {
-          value: $r('app.string.dialog_btn_confirm'),
-          action: () => {
-            HuaweiAccountManager.getInstance().logout().then(() => {
-              this.syncHuaweiAccountState();
-              this.isAccountSheetVisible = false;
-              AppPreference.setPreference(PREF_KEYS.APPEARANCE_HUAWEI_CLOUD_SYNC_ENABLE, false);
-              AppPreference.setPreference(PREF_KEYS.CLOUD_SYNC_LAST_TIME, '0');
-            });
-          }
-        },
-        {
-          value: $r('app.string.dialog_btn_cancel'),
-          action: () => {}
-        },
-      ],
-      cancel: () => {},
-    });
-  }
-
   private subscribeDistributedAccountLogout(): void {
     const subscribeInfo: CommonEventManager.CommonEventSubscribeInfo = {
       events: [
@@ -670,7 +574,10 @@ struct Index {
       CommonEventManager.subscribe(subscriber, (err) => {
         if (!err) {
           HuaweiAccountManager.getInstance().logout().then(() => {
-            this.syncHuaweiAccountState();
+            // 账号 UI 状态由 SheetCoordinator 持有，广播事件通知其重新同步
+            if (this.appCtx.eventHub != undefined) {
+              this.appCtx.eventHub.emit(EVENT_NAMES.HUAWEI_ACCOUNT_STATE_CHANGED);
+            }
             AppPreference.setPreference(PREF_KEYS.APPEARANCE_HUAWEI_CLOUD_SYNC_ENABLE, false);
             AppPreference.setPreference(PREF_KEYS.CLOUD_SYNC_LAST_TIME, '0');
           });
@@ -709,6 +616,13 @@ struct Index {
         })
         this.dialog_totp_config.open()
       }
+    }).catch((err: BusinessError) => {
+      // 1000500002: 用户取消扫码, 静默处理
+      if (err.code === 1000500002) {
+        return;
+      }
+      hilog.error(0x0000, 'Index', `start_quick_scan failed: ${err.code} ${err.message}`);
+      showSnackBar($r('app.string.toast_scan_failed'), SnackBarNotifyType.ERROR);
     });
   }
 
@@ -793,84 +707,9 @@ struct Index {
     });
   }
 
-  @Builder
-  SettingSheetBuilder() {
-  SettingPage({
-      Tokens: this.CurrentTokens,
-      appBottomAvoidHeight: this.window.AvoidBottomHeight,
-      appTopAvoidHeight: 0,
-      scrollEffectType: ScrollEffectType.IMMERSIVE_GRADIENT_BLUR,
-      listScroller: this.settingEntryScroller,
-      backupReload: async (conf) => {
-        await this.updateTokenConfigs(conf);
-        tkStore.sortTokens();
-      }
-    })
-      .height('100%')
-  }
-
-  @Builder
-  BackupAndMigrationSheetBuilder() {
-    BackupAndMigrationSheet({
-      Tokens: this.CurrentTokens,
-      scrollEffectStyle: this.currentScrollEffectType,
-      backupReload: async (conf) => {
-        await this.updateTokenConfigs(conf);
-        tkStore.sortTokens();
-      }
-    })
-      .height('100%')
-  }
-
-  @Builder
-  SecuritySheetBuilder() {
-    SecuritySheet({
-      scrollEffectStyle: this.currentScrollEffectType,
-    })
-      .height('100%')
-  }
-
-  @Builder
-  AppearanceSheetBuilder() {
-    AppearanceSheet({
-      scrollEffectType: this.currentScrollEffectType,
-    })
-      .height('100%')
-  }
-
-  @Builder
-  DataSyncSheetBuilder() {
-    DataSyncSheet({
-      scrollEffectType: this.currentScrollEffectType,
-    })
-      .height('100%')
-  }
-
-  @Builder
-  AgreementSheetBuilder() {
-    AgreementSheet({
-      scrollEffectType: this.currentScrollEffectType,
-    })
-      .height('100%')
-  }
-
-  @Builder
-  AboutSheetBuilder() {
-    AboutSheet({
-      scrollEffectStyle: this.currentScrollEffectType,
-    })
-      .height('100%')
-  }
-
-  @Builder
-  FeedbackSheetBuilder() {
-    FeedbackSheet({
-      scrollEffectType: this.currentScrollEffectType,
-    })
-      .height('100%')
-  }
-
-  @Builder
+  // [@LocalBuilder] 作为 @BuilderParam 传给 AppShell 时保持 this 指向 Index,
+  // 普通 @Builder 会被调用方(AppShell)重绑定 this,导致 this.window 等状态读取为 undefined 引发崩溃
+  @LocalBuilder
   AppLockOverlayBuilder() {
     AppLockOverlay({
       onUnlock: () => {
@@ -882,734 +721,70 @@ struct Index {
     })
   }
 
-  @Builder
-  AccountSheetBuilder() {
-    Column() {
-      Column() {
-        SymbolGlyph($r('sys.symbol.person_crop_circle_fill_1'))
-          .fontSize($r('sys.float.Display_L'))
-          .fontColor([$r('sys.color.icon_emphasize')])
-          .aspectRatio(1)
-
-        Text(this.isHuaweiLoggedIn ?
-          $r('app.string.huawei_account_current') :
-          $r('app.string.huawei_account_select_title'))
-          .fontSize($r('sys.float.Title_M'))
-          .fontWeight(FontWeight.Bold)
-          .fontColor($r('sys.color.font_primary'))
-          .margin({ top: $r('sys.float.padding_level10') })
-
-        if (this.huaweiUser) {
-          if (this.huaweiUser.avatarUri !== '') {
-            Image(this.huaweiUser.avatarUri)
-              .draggable(false)
-              .width(85)
-              .height(85)
-              .borderRadius(42.5)
-              .margin({ top: 40 })
-          } else if (this.huaweiUser.nickname !== '') {
-            Text(this.huaweiUser.nickname.length > 0 ?
-              this.huaweiUser.nickname.substring(this.huaweiUser.nickname.length - 1) : '')
-              .width(85)
-              .height(85)
-              .borderRadius(42.5)
-              .backgroundColor($r('sys.color.ohos_id_color_tertiary'))
-              .linearGradient({
-                colors: [
-                  [$r('sys.color.ohos_id_color_tertiary'), 0.0],
-                  [$r('sys.color.ohos_id_color_foreground_contrary'), 1.0]
-                ]
-              })
-              .fontColor($r('sys.color.font_on_primary'))
-              .fontSize($r('sys.float.Title_M'))
-              .fontWeight(FontWeight.Bold)
-              .textAlign(TextAlign.Center)
-              .margin({ top: 40 })
-          }
-
-          Text(this.huaweiUser.nickname)
-            .margin({ top: $r('sys.float.padding_level12') })
-            .fontSize($r('sys.float.Body_L'))
-            .fontWeight(FontWeight.Bold)
-            .fontColor($r('sys.color.font_primary'))
-        }
+  /**
+   * "我的"页签内容(Task 3.1):由 SheetCoordinator 承载全部设置入口与 Sheet
+   * [@LocalBuilder] 作为 @BuilderParam 传给 HomeTabs 时保持 this 指向 Index
+   */
+  @LocalBuilder
+  SettingEntryContentBuilder() {
+    SheetCoordinator({
+      tokens: this.CurrentTokens,
+      scrollEffectType: this.currentScrollEffectType,
+      scroller: this.settingEntryScroller,
+      bottomAvoidHeight: this.window.AvoidBottomHeight,
+      backupReload: async (conf) => {
+        await this.updateTokenConfigs(conf);
+        tkStore.sortTokens();
       }
-      .margin({ top: $r('sys.float.padding_level16') })
-
-      Blank();
-
-      Button(this.isHuaweiLoggedIn ?
-        $r('app.string.huawei_account_logout') :
-        $r('app.string.huawei_account_select_to_login'))
-        .type(ButtonType.Capsule)
-        .fontSize($r('sys.float.Body_L'))
-        .role(this.isHuaweiLoggedIn ? ButtonRole.ERROR : ButtonRole.NORMAL)
-        .buttonStyle(this.isHuaweiLoggedIn ? ButtonStyleMode.NORMAL : ButtonStyleMode.EMPHASIZED)
-        .width('100%')
-        .margin({ bottom: $r('sys.float.padding_level24') })
-        .onClick(() => {
-          if (this.isHuaweiLoggedIn) {
-            this.showLogoutConfirmDialog();
-          } else {
-            this.confirmHuaweiLogin();
-          }
-        })
-    }
-    .padding({ left: $r('sys.float.padding_level8'), right: $r('sys.float.padding_level8') })
-    .width('100%')
-    .height('100%')
+    })
   }
 
-  @Builder
-  SettingEntryCardBuilder() {
-    List({ space: 10, scroller: this.settingEntryScroller }) {
-      // 华为账号登录卡片
-      ListItem() {
-        Row({ space: 16 }) {
-          if (this.isHuaweiLoggedIn && this.huaweiUser && this.huaweiUser.avatarUri !== '') {
-            Image(this.huaweiUser.avatarUri)
-              .draggable(false)
-              .width(48)
-              .height(48)
-              .borderRadius(24)
-          } else if (this.isHuaweiLoggedIn && this.huaweiUser && this.huaweiUser.nickname !== '') {
-            Text(this.huaweiUser.nickname.length > 0 ?
-              this.huaweiUser.nickname.substring(this.huaweiUser.nickname.length - 1) : '')
-              .width(48)
-              .height(48)
-              .borderRadius(24)
-              .backgroundColor($r('sys.color.ohos_id_color_tertiary'))
-              .linearGradient({
-                colors: [
-                  [$r('sys.color.ohos_id_color_tertiary'), 0.0],
-                  [$r('sys.color.ohos_id_color_foreground_contrary'), 1.0]
-                ]
-              })
-              .fontColor($r('sys.color.font_on_primary'))
-              .fontSize(20)
-              .fontWeight(FontWeight.Bold)
-              .textAlign(TextAlign.Center)
-          } else {
-            SymbolGlyph($r('sys.symbol.person_crop_circle_fill_1'))
-              .fontSize(48)
-              .fontColor([$r('sys.color.ohos_id_color_text_secondary')])
-          }
-
-          Column({ space: 4 }) {
-            Text(this.isHuaweiLoggedIn && this.huaweiUser ?
-              this.huaweiUser.nickname : $r('app.string.huawei_account_login'))
-              .fontSize(18)
-              .fontWeight(FontWeight.Medium)
-              .fontColor($r('sys.color.ohos_id_color_text_primary'))
-              .maxLines(1)
-              .textOverflow({ overflow: TextOverflow.Ellipsis })
-
-            Text(this.isHuaweiLoggedIn ?
-              $r('app.string.huawei_account_current') :
-              $r('app.string.huawei_account_login_desc'))
-              .fontSize(14)
-              .fontColor($r('sys.color.ohos_id_color_text_secondary'))
-              .maxLines(1)
-          }
-          .alignItems(HorizontalAlign.Start)
-          .layoutWeight(1)
-        }
-        .width('100%')
-        .padding({ left: 20, right: 20, top: 16, bottom: 16 })
-        .alignItems(VerticalAlign.Center)
-        .borderRadius($r('sys.float.ohos_id_menu_outer_border_radius'))
-        .backgroundColor($r('app.color.item_bg'))
-        .onClick(() => {
-          if (!this.isHuaweiLoggedIn) {
-            this.triggerHuaweiLogin();
-          } else {
-            this.isAccountSheetVisible = true;
-          }
-        })
-        .bindSheet($$this.isAccountSheetVisible, this.AccountSheetBuilder(), {
-          detents: [SheetSize.MEDIUM],
-          preferType: SheetType.BOTTOM,
-          dragBar: true,
-        })
-      }
-      .padding({
-        left: $r('sys.float.padding_level8'),
-        right: $r('sys.float.padding_level8'),
-      })
-
-      // 备份与迁移入口
-      ListItem() {
-        Column() {
-          HdsListItemCard({
-            cardPrefixMargin: $r('sys.float.padding_level2'),
-            cardSuffixMargin: $r('sys.float.padding_level2'),
-            cardBackgroundColor: $r('app.color.item_bg'),
-            cardHeight: CommonConstants.SETTING_OPTION_CARD_HEIGHT,
-            prefixItem: new PrefixIcon({
-              iconSize: IconSize.SYSTEM_ICON,
-              iconValue: {
-                symbol: $r('sys.symbol.save')
-              }
-            }),
-            textItem: {
-              primaryText: {
-                text: $r('app.string.setting_backup')
-              }
-            },
-            suffixItem: new SuffixArrow({}),
-            onClick: () => {
-              this.isBackupSheetVisible = true;
-            }
-          })
-            .bindSheet($$this.isBackupSheetVisible, this.BackupAndMigrationSheetBuilder(), {
-              detents: [SheetSize.LARGE],
-              preferType: SheetType.BOTTOM,
-              dragBar: true,
-            })
-        }
-        .padding({
-          top: $r('sys.float.padding_level2'),
-          bottom: $r('sys.float.padding_level2'),
-        })
-        .borderRadius($r('sys.float.ohos_id_menu_outer_border_radius'))
-        .backgroundColor($r('app.color.item_bg'))
-      }
-      .padding({
-        left: $r('sys.float.padding_level8'),
-        right: $r('sys.float.padding_level8'),
-      })
-
-      // 安全性入口
-      ListItem() {
-        Column() {
-          HdsListItemCard({
-            cardPrefixMargin: $r('sys.float.padding_level2'),
-            cardSuffixMargin: $r('sys.float.padding_level2'),
-            cardBackgroundColor: $r('app.color.item_bg'),
-            cardHeight: CommonConstants.SETTING_OPTION_CARD_HEIGHT,
-            prefixItem: new PrefixIcon({
-              iconSize: IconSize.SYSTEM_ICON,
-              iconValue: {
-                symbol: $r('sys.symbol.staroflife_rectangle')
-              }
-            }),
-            textItem: {
-              primaryText: {
-                text: $r('app.string.setting_safety')
-              }
-            },
-            suffixItem: new SuffixArrow({}),
-            onClick: () => {
-              this.isSafetySheetVisible = true;
-            }
-          })
-            .bindSheet($$this.isSafetySheetVisible, this.SecuritySheetBuilder(), {
-              detents: [SheetSize.LARGE],
-              preferType: SheetType.BOTTOM,
-              dragBar: true,
-            })
-        }
-        .padding({
-          top: $r('sys.float.padding_level2'),
-          bottom: $r('sys.float.padding_level2'),
-        })
-        .borderRadius($r('sys.float.ohos_id_menu_outer_border_radius'))
-        .backgroundColor($r('app.color.item_bg'))
-      }
-      .padding({
-        left: $r('sys.float.padding_level8'),
-        right: $r('sys.float.padding_level8'),
-      })
-
-      // 外观与功能入口
-      ListItem() {
-        Column() {
-          HdsListItemCard({
-            cardPrefixMargin: $r('sys.float.padding_level2'),
-            cardSuffixMargin: $r('sys.float.padding_level2'),
-            cardBackgroundColor: $r('app.color.item_bg'),
-            cardHeight: CommonConstants.SETTING_OPTION_CARD_HEIGHT,
-            prefixItem: new PrefixIcon({
-              iconSize: IconSize.SYSTEM_ICON,
-              iconValue: {
-                symbol: $r('sys.symbol.chevron_up_2_circle')
-              }
-            }),
-            textItem: {
-              primaryText: {
-                text: $r('app.string.app_appearance')
-              }
-            },
-            suffixItem: new SuffixArrow({}),
-            onClick: () => {
-              this.isAppearanceSheetVisible = true;
-            }
-          })
-            .bindSheet($$this.isAppearanceSheetVisible, this.AppearanceSheetBuilder(), {
-              detents: [SheetSize.LARGE],
-              preferType: SheetType.BOTTOM,
-              dragBar: true,
-            })
-        }
-        .padding({
-          top: $r('sys.float.padding_level2'),
-          bottom: $r('sys.float.padding_level2'),
-        })
-        .borderRadius($r('sys.float.ohos_id_menu_outer_border_radius'))
-        .backgroundColor($r('app.color.item_bg'))
-      }
-      .padding({
-        left: $r('sys.float.padding_level8'),
-        right: $r('sys.float.padding_level8'),
-      })
-
-      // 数据同步入口
-      ListItem() {
-        Column() {
-          HdsListItemCard({
-            cardPrefixMargin: $r('sys.float.padding_level2'),
-            cardSuffixMargin: $r('sys.float.padding_level2'),
-            cardBackgroundColor: $r('app.color.item_bg'),
-            cardHeight: CommonConstants.SETTING_OPTION_CARD_HEIGHT,
-            prefixItem: new PrefixIcon({
-              iconSize: IconSize.SYSTEM_ICON,
-              iconValue: {
-                symbol: $r('sys.symbol.link')
-              }
-            }),
-            textItem: {
-              primaryText: {
-                text: $r('app.string.data_sync')
-              }
-            },
-            suffixItem: new SuffixArrow({}),
-            onClick: () => {
-              this.isDataSyncSheetVisible = true;
-            }
-          })
-            .bindSheet($$this.isDataSyncSheetVisible, this.DataSyncSheetBuilder(), {
-              detents: [SheetSize.LARGE],
-              preferType: SheetType.BOTTOM,
-              dragBar: true,
-            })
-        }
-        .padding({
-          top: $r('sys.float.padding_level2'),
-          bottom: $r('sys.float.padding_level2'),
-        })
-        .borderRadius($r('sys.float.ohos_id_menu_outer_border_radius'))
-        .backgroundColor($r('app.color.item_bg'))
-      }
-      .padding({
-        left: $r('sys.float.padding_level8'),
-        right: $r('sys.float.padding_level8'),
-      })
-
-      // 协议与声明入口
-      ListItem() {
-        Column() {
-          HdsListItemCard({
-            cardPrefixMargin: $r('sys.float.padding_level2'),
-            cardSuffixMargin: $r('sys.float.padding_level2'),
-            cardBackgroundColor: $r('app.color.item_bg'),
-            cardHeight: CommonConstants.SETTING_OPTION_CARD_HEIGHT,
-            prefixItem: new PrefixIcon({
-              iconSize: IconSize.SYSTEM_ICON,
-              iconValue: {
-                symbol: $r('sys.symbol.person_shield')
-              }
-            }),
-            textItem: {
-              primaryText: {
-                text: $r('app.string.setting_agreement_statement')
-              }
-            },
-            suffixItem: new SuffixArrow({}),
-            onClick: () => {
-              this.isAgreementSheetVisible = true;
-            }
-          })
-            .bindSheet($$this.isAgreementSheetVisible, this.AgreementSheetBuilder(), {
-              detents: [SheetSize.LARGE],
-              preferType: SheetType.BOTTOM,
-              dragBar: true,
-            })
-        }
-        .padding({
-          top: $r('sys.float.padding_level2'),
-          bottom: $r('sys.float.padding_level2'),
-        })
-        .borderRadius($r('sys.float.ohos_id_menu_outer_border_radius'))
-        .backgroundColor($r('app.color.item_bg'))
-      }
-      .padding({
-        left: $r('sys.float.padding_level8'),
-        right: $r('sys.float.padding_level8'),
-      })
-
-      // 建议与反馈入口
-      ListItem() {
-        Column() {
-          HdsListItemCard({
-            cardPrefixMargin: $r('sys.float.padding_level2'),
-            cardSuffixMargin: $r('sys.float.padding_level2'),
-            cardBackgroundColor: $r('app.color.item_bg'),
-            cardHeight: CommonConstants.SETTING_OPTION_CARD_HEIGHT,
-            prefixItem: new PrefixIcon({
-              iconSize: IconSize.SYSTEM_ICON,
-              iconValue: {
-                symbol: $r('sys.symbol.envelope')
-              }
-            }),
-            textItem: {
-              primaryText: {
-                text: $r('app.string.setting_feedback')
-              }
-            },
-            suffixItem: new SuffixArrow({}),
-            onClick: () => {
-              this.isFeedbackSheetVisible = true;
-            }
-          })
-            .bindSheet($$this.isFeedbackSheetVisible, this.FeedbackSheetBuilder(), {
-              detents: [SheetSize.LARGE],
-              preferType: SheetType.BOTTOM,
-              dragBar: true,
-            })
-        }
-        .padding({
-          top: $r('sys.float.padding_level2'),
-          bottom: $r('sys.float.padding_level2'),
-        })
-        .borderRadius($r('sys.float.ohos_id_menu_outer_border_radius'))
-        .backgroundColor($r('app.color.item_bg'))
-      }
-      .padding({
-        left: $r('sys.float.padding_level8'),
-        right: $r('sys.float.padding_level8'),
-      })
-
-      // 关于入口
-      ListItem() {
-        Column() {
-          HdsListItemCard({
-            cardPrefixMargin: $r('sys.float.padding_level2'),
-            cardSuffixMargin: $r('sys.float.padding_level2'),
-            cardBackgroundColor: $r('app.color.item_bg'),
-            cardHeight: CommonConstants.SETTING_OPTION_CARD_HEIGHT,
-            prefixItem: new PrefixIcon({
-              iconSize: IconSize.SYSTEM_ICON,
-              iconValue: {
-                symbol: $r('sys.symbol.info_circle')
-              }
-            }),
-            textItem: {
-              primaryText: {
-                text: $r('app.string.setting_about')
-              }
-            },
-            suffixItem: new SuffixArrow({}),
-            onClick: () => {
-              this.isAboutSheetVisible = true;
-            }
-          })
-            .bindSheet($$this.isAboutSheetVisible, this.AboutSheetBuilder(), {
-              detents: [SheetSize.LARGE],
-              preferType: SheetType.BOTTOM,
-              dragBar: true,
-            })
-        }
-        .padding({
-          top: $r('sys.float.padding_level2'),
-          bottom: $r('sys.float.padding_level2'),
-        })
-        .borderRadius($r('sys.float.ohos_id_menu_outer_border_radius'))
-        .backgroundColor($r('app.color.item_bg'))
-      }
-      .padding({
-        left: $r('sys.float.padding_level8'),
-        right: $r('sys.float.padding_level8'),
-      })
-    }
-    .clip(false)
-    .chainAnimation(this.token_preference.app_appearance_chain_animation_enable)
-    .width('100%')
-    .height('100%')
-    .scrollBar(BarState.Off)
-    .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
-    .backgroundColor($r('app.color.window_background'))
-  }
-
-  @Builder
-  navDestinationBuilder(name: string, param: Object) {
-    if (name === ROUTE_NAMES.AppearancePage) {
-      AppearancePage({ scrollEffectType: this.currentScrollEffectType })
-    } else if (name === ROUTE_NAMES.ShowDataSyncDetailsPage) {
-      ShowDataSyncDetailsPage({ scrollEffectType: this.currentScrollEffectType })
-    } else if (name === ROUTE_NAMES.ShowCloudSyncDetailsPage) {
-      ShowCloudSyncDetailsPage({ scrollEffectType: this.currentScrollEffectType })
-    } else if (name === ROUTE_NAMES.ShowCloudBackupHistoryPage) {
-      ShowCloudBackupHistoryPage({ scrollEffectType: this.currentScrollEffectType })
-    } else if (name === ROUTE_NAMES.ShowCodePage) {
-      ShowCodePage()
-    } else if (name === ROUTE_NAMES.WebPage) {
-      WebPage({ scrollEffectType: this.currentScrollEffectType, pageParams: param as WebPageParams })
-    } else if (name === ROUTE_NAMES.TokenCardConfigPage) {
-      TokenCardConfigPage()
-    } else if (name === ROUTE_NAMES.TokenSortPage) {
-      TokenSortPage({ scrollEffectType: this.currentScrollEffectType })
-    } else if (name === ROUTE_NAMES.TokenSearchPage) {
-      TokenSearchPage({ scrollEffectType: this.currentScrollEffectType })
-    }
+  /**
+   * 首页内容(Task 3.1):断点 lanes + 双页签,由 HomeTabs 承载
+   * [@LocalBuilder] 作为 @BuilderParam 传给 AppShell 时保持 this 指向 Index
+   */
+  @LocalBuilder
+  HomeContentBuilder() {
+    HomeTabs({
+      tokens: this.CurrentTokens,
+      window: this.window,
+      scrollEffectType: this.currentScrollEffectType,
+      pageInfos: this.pageInfos,
+      updateTokenConfig: (conf: TokenConfig, toast?: boolean) => this.updateTokenConfig(conf, toast),
+      updateTokenConfigs: (tokens: Array<TokenConfig>) => this.updateTokenConfigs(tokens),
+      openAddTokenMenu: () => this.openAddTokenMenu(),
+      addTokenMenuTargetId: this.addTokenMenuTargetId,
+      tokenListScroller: this.tokenListScroller,
+      settingEntryScroller: this.settingEntryScroller,
+      settingEntryContent: this.SettingEntryContentBuilder,
+    })
   }
 
   build() {
-    HdsNavigation(this.pageInfos) {
-      Stack() {
-        if (this.token_loading) {
-          Column() {
-            LoadingProgress()
-              .color(Color.White)
-              .width(80).height(80)
-            Text('Loading..')
-              .fontSize(16)
-              .fontColor(Color.White)
+    Stack() {
+      AppShell({
+        pageInfos: this.pageInfos,
+        isLoading: this.token_loading as boolean,
+        blurFlag: this.background_blur_flag as boolean,
+        applockVisible: this.isAppLockOverlayVisible,
+        scrollEffectType: this.currentScrollEffectType,
+        onDropFile: () => {
+          this.DropFilesDialogIsOpen = false;
+          this.DropFilesDialogController?.close();
+        },
+        onDragEnterFile: () => {
+          if (!this.DropFilesDialogIsOpen) {
+            this.DropFilesDialogIsOpen = true;
+            this.DropFilesDialogController?.open();
           }
-          .width('100%')
-          .height('100%')
-          .backgroundColor('#40000000')
-          .justifyContent(FlexAlign.Center)
-        } else if (
-          (this.window.HeightBreakpoint === HeightBreakpoint.HEIGHT_MD) &&
-            this.window.WidthBreakpoint === WidthBreakpoint.WIDTH_XS
-        ) {
-          ArcTokenListPage({
-            Tokens: this.CurrentTokens,
-            TabBarVisible: false,
-            appBottomAvoidHeight: this.window.AvoidBottomHeight,
-            appTopAvoidHeight: this.window.AvoidTopHeight,
-            appWindowSize: this.window.Size,
-            updateTokenConfig: this.updateTokenConfig,
-            updateTokenConfigs: this.updateTokenConfigs,
-            listScroller: this.arcTokenListScroller,
-          })
-        } else if (
-          (this.window.HeightBreakpoint === HeightBreakpoint.HEIGHT_MD ||
-            this.window.HeightBreakpoint === HeightBreakpoint.HEIGHT_SM) &&
-            this.window.WidthBreakpoint === WidthBreakpoint.WIDTH_SM
-        ) {
-          Column() {
-            TokenListPage({
-              Tokens: this.CurrentTokens,
-              TabBarVisible: false,
-              appBottomAvoidHeight: this.window.AvoidBottomHeight,
-              appTopAvoidHeight: this.window.AvoidTopHeight,
-              appWindowSize: this.window.Size,
-              updateTokenConfig: this.updateTokenConfig,
-              updateTokenConfigs: this.updateTokenConfigs,
-              listScroller: this.tokenListScroller,
-            })
-          }
-          .backgroundColor($r('app.color.window_background'))
-        } else {
-
-          Column() {
-            HdsTabs({ index: this.tab_bar_index }) {
-              TabContent() {
-                HdsNavigation() {
-                  TokenListPage({
-                    Tokens: this.CurrentTokens,
-                    TabBarVisible: true,
-                    appBottomAvoidHeight: this.window.AvoidBottomHeight,
-                    appTopAvoidHeight: this.window.AvoidTopHeight,
-                    appWindowSize: this.window.Size,
-                    updateTokenConfig: this.updateTokenConfig,
-                    updateTokenConfigs: this.updateTokenConfigs,
-                    listScroller: this.tokenListScroller,
-                  })
-                }
-                .mode(NavigationMode.Stack)
-                .bindToScrollable([this.tokenListScroller])
-                .titleMode(HdsNavigationTitleMode.MINI)
-                .hideBackButton(true) // 设置mini类型隐藏后退按钮
-                .titleBar({
-                  avoidLayoutSafeArea: true, // 状态栏安全区沉浸
-                  enableComponentSafeArea: true,
-                  style: {
-                    originalStyle: {
-                      contentStyle: {
-                        titleStyle: {
-                          mainTitleColor: $r('sys.color.font_primary'),
-                        },
-                        menuStyle: {
-                          iconColor: $r('sys.color.icon_primary')
-                        },
-                      }
-                    },
-                    scrollEffectOpts: {
-                      enableScrollEffect: true,
-                      scrollEffectType: this.currentScrollEffectType // 渐变模糊
-                    },
-                    systemMaterialEffect: {
-                      materialType: hdsMaterial.MaterialType.ADAPTIVE,
-                      materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
-                    }
-                  },
-                  content: {
-                    title: {
-                      mainTitle: $r('app.string.EntryAbility_label'),
-                    },
-                    menu: {
-                      value: [
-                        {
-                          content: {
-                            label: $r('app.string.app_ua_search_token'),
-                            icon: $r('sys.symbol.magnifyingglass'),
-                            isEnabled: true,
-                            action: () => {
-                              this.pageInfos.pushPathByName(ROUTE_NAMES.TokenSearchPage, null);
-                            }
-                          }
-                        },
-                        {
-                          content: {
-                            label: $r('app.string.app_ua_add_token'),
-                            icon: $r('sys.symbol.plus'),
-                            isEnabled: true,
-                            componentId: this.addTokenMenuTargetId,
-                            action: () => {
-                              this.openAddTokenMenu();
-                            }
-                          }
-                        }
-                      ]
-                    }
-                  }
-                })
-              }
-              .backgroundColor($r('app.color.window_background'))
-              .tabBar(BottomTabBarStyle.of(
-                {
-                  normal: new SymbolGlyphModifier($r('sys.symbol.key_fill')),
-                  selected: new SymbolGlyphModifier($r('sys.symbol.key_fill'))
-                },
-                $r('app.string.tab_token'))
-                .verticalAlign(VerticalAlign.Center)
-              )
-              .tabIndex(0)
-
-              TabContent() {
-                // [冷启动优化] Setting Tab 懒加载：仅在用户首次切换到"我的"Tab 时构建组件树，
-                // 避免冷启动时一次性构建两个 TabContent 导致首帧 build 耗时增加
-                if (this.settingTabInitialized) {
-                  HdsNavigation() {
-                    this.SettingEntryCardBuilder()
-                  }
-                  .mode(NavigationMode.Stack)
-                  .bindToScrollable([this.settingEntryScroller])
-                  .titleMode(HdsNavigationTitleMode.MINI)
-                  .hideBackButton(true)
-                  .titleBar({
-                    avoidLayoutSafeArea: true,
-                    enableComponentSafeArea: true,
-                    style: {
-                      originalStyle: {
-                        contentStyle: {
-                          titleStyle: {
-                            mainTitleColor: $r('sys.color.font_primary'),
-                          },
-                          menuStyle: {
-                            iconColor: $r('sys.color.icon_primary')
-                          },
-                        },
-                      },
-                      scrollEffectOpts: {
-                        enableScrollEffect: true,
-                        scrollEffectType: this.currentScrollEffectType,
-                      },
-                      systemMaterialEffect: {
-                        materialType: hdsMaterial.MaterialType.ADAPTIVE,
-                        materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
-                      }
-                    },
-                    content: {
-                      title: {
-                        mainTitle: $r('app.string.tab_me')
-                      },
-                      menu: {
-                        value: []
-                      }
-                    }
-                  })
-                }
-              }
-              .backgroundColor($r('app.color.window_background'))
-              .tabBar(BottomTabBarStyle.of(
-                {
-                  normal: new SymbolGlyphModifier($r('sys.symbol.person_crop_circle_fill_1')),
-                  selected: new SymbolGlyphModifier($r('sys.symbol.person_crop_circle_fill_1')),
-                },
-                $r('app.string.tab_me'))
-                .verticalAlign(VerticalAlign.Center)
-              )
-              .tabIndex(1)
-            }
-            .barBackgroundColor($r('app.color.tab_bar_bg'))
-            .backgroundColor($r('app.color.window_background'))
-            .layoutWeight(1)
-            .barOverlap(true)
-            .barBackgroundColor(Color.Transparent)
-            .barBackgroundBlurStyle(BlurStyle.Regular)
-            .barPosition(BarPosition.End)
-            .barFloatingStyle({
-              barBottomMargin: 28,
-              systemMaterialEffect: {
-                materialType: hdsMaterial.MaterialType.ADAPTIVE,
-                materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
-              }
-            })
-            .vertical(false)
-            .barMode(BarMode.Fixed)
-            .animationDuration(300)
-            .onChange((index) => {
-              this.tab_bar_index = index;
-              // [冷启动优化] 用户首次切换到 Setting Tab 时触发懒加载构建
-              if (index === 1 && !this.settingTabInitialized) {
-                this.settingTabInitialized = true;
-              }
-            })
-          }
-        }
-      }
-      .width('100%')
-      .height('100%')
-      .allowDrop([uniformTypeDescriptor.UniformDataType.FILE])
-      .onDrop(() => {
-        this.DropFilesDialogIsOpen = false;
-        this.DropFilesDialogController?.close();
-      })
-      .onDragEnter(() => {
-        if (!this.DropFilesDialogIsOpen) {
-          this.DropFilesDialogIsOpen = true;
-          this.DropFilesDialogController?.open();
-        }
-      })
-      .onDragLeave(() => {
-        this.DropFilesDialogIsOpen = false;
-        this.DropFilesDialogController?.close();
-      })
-      .foregroundBlurStyle((this.background_blur_flag || this.isAppLockOverlayVisible) ? BlurStyle.Thin : BlurStyle.NONE, {
-        colorMode: ThemeColorMode.SYSTEM,
-        adaptiveColor: AdaptiveColor.DEFAULT
+        },
+        onDragLeaveFile: () => {
+          this.DropFilesDialogIsOpen = false;
+          this.DropFilesDialogController?.close();
+        },
+        appLockContent: this.AppLockOverlayBuilder,
+        homeContent: this.HomeContentBuilder,
       })
     }
-    .hideTitleBar(true)
-    .mode(NavigationMode.Stack)
-    .navDestination(this.navDestinationBuilder)
-    .bindContentCover($$this.isAppLockOverlayVisible, this.AppLockOverlayBuilder(), {
-      modalTransition: ModalTransition.NONE,
-      onWillDismiss: (dismissContentCoverAction: DismissContentCoverAction) => {
-      },
-    })
   }
 }
