@@ -36,3 +36,6 @@ hvigorw
 
 # Hermes Agent 会话产物
 .hermes/
+
+# OpenSpec 本地配置
+openspec/
