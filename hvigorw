@@ -1,19 +1,49 @@
 #!/bin/bash
 # Hvigor wrapper for ohtotptoken project
-# Uses globally installed @ohos/hvigor
+# Uses the hvigor/node/JDK bundled with DevEco Studio so no global install is needed.
+
+set -e
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-export HVIGOR_HOME="$HOME/.npm-global/lib/node_modules/@ohos/hvigor"
-export NODE_OPTIONS=""
 
-# Set npm registry for HarmonyOS packages
-export npm_config_registry="https://repo.harmonyos.com/npm/"
+# Locate DevEco Studio install dir: $DEVECO_PATH, or common install paths.
+DEVECO="${DEVECO_PATH:-}"
+if [ -z "$DEVECO" ] || [ ! -d "$DEVECO" ]; then
+    for cand in \
+        "/c/Program Files/Huawei/DevEco Studio" \
+        "/d/Program Files/Huawei/DevEco Studio"; do
+        if [ -d "$cand" ]; then
+            DEVECO="$cand"
+            break
+        fi
+    done
+fi
+if [ -z "$DEVECO" ] || [ ! -d "$DEVECO" ]; then
+    echo "Error: DevEco Studio not found. Set DEVECO_PATH to its install dir." >&2
+    exit 1
+fi
 
-# If JDK is available, add it to PATH
-if [ -d "/usr/lib/jvm/java-17-openjdk-amd64" ]; then
-    export JAVA_HOME="/usr/lib/jvm/java-17-openjdk-amd64"
+# DevEco ships node (avoid PATH collisions with system node versions).
+DEV_NODE="$DEVECO/tools/node/node.exe"
+if [ ! -f "$DEV_NODE" ]; then
+    echo "Error: bundled node not found at $DEV_NODE" >&2
+    exit 1
+fi
+
+# DevEco ships a JDK under jbr (required by hvigor/Gradle).
+if [ -d "$DEVECO/jbr" ]; then
+    export JAVA_HOME="$DEVECO/jbr"
     export PATH="$JAVA_HOME/bin:$PATH"
 fi
 
+export NODE_OPTIONS=""
+# HarmonyOS package registry.
+export npm_config_registry="https://repo.harmonyos.com/npm/"
+
+# hvigor needs DEVECO_SDK_HOME pointing at the dir that contains the SDK (e.g. <sdk>/default).
+if [ -z "$DEVECO_SDK_HOME" ] && [ -d "$DEVECO/sdk" ]; then
+    export DEVECO_SDK_HOME="$DEVECO/sdk"
+fi
+
 cd "$DIR"
-exec node "$HVIGOR_HOME/bin/hvigor.js" "$@"
+exec "$DEV_NODE" "$DEVECO/tools/hvigor/bin/hvigorw.js" "$@"
