@@ -1,16 +1,18 @@
 import { AppStorageV2 } from '@kit.ArkUI';
 import { TopNavigationView } from '../components/TopNavigationView';
 import { SettingItem } from '../components/SettingItem';
-import { AppPreference, SettingValue, PREF_KEYS } from '../utils/AppPreference';
+import { AppPreference, SettingValue, PREF_KEYS } from 'common';
 import { SubItemButton } from '../components/SubItemButton';
-import { TokenStore } from '../utils/TokenStore';
+import { TokenStore } from 'common';
 import { SubItemDivider } from '../components/SubItemDivider';
-import { AppWindowInfo } from '../entryability/EntryAbility';
-import { DeviceInfoHelper,DeviceInfoData } from '../utils/DeviceInfoHelper';
+import { AppWindowInfo } from 'common';
+import { PageScaffold } from '../components/PageScaffold';
+import { DeviceInfoHelper,DeviceInfoData } from 'common';
 import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit';
-import { CommonConstants } from '../utils/CommonConstants';
-import { showSnackBar, SnackBarNotifyType } from '../utils/HdsSnackBarUtils';
+import { CommonConstants } from 'common';
+import { showSnackBar, SnackBarNotifyType } from 'common';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { SETTING_PAGE_INSET } from '../components/SettingStyle';
 
 const TAG = 'ShowDataSyncDetailsPage';
 const DOMAIN = 0xFF00;
@@ -42,7 +44,7 @@ export struct ShowDataSyncDetailsPage {
 
   build() {
     HdsNavDestination() {
-      Column() {
+      PageScaffold() {
         RelativeContainer() {
           Stack() {
             if (this.Is_loaded) {
@@ -88,7 +90,7 @@ export struct ShowDataSyncDetailsPage {
                   }
 
                 }
-                .padding({ left: 10, right: 10 })
+                .padding({ left: SETTING_PAGE_INSET, right: SETTING_PAGE_INSET })
 
                 ListItem() {
                   SettingItem({ title: $r('app.string.data_kv_sync_time') }) {
@@ -124,7 +126,7 @@ export struct ShowDataSyncDetailsPage {
                       })
                   }
                 }
-                .padding({ left: 10, right: 10 })
+                .padding({ left: SETTING_PAGE_INSET, right: SETTING_PAGE_INSET })
 
               }
               .chainAnimation(AppPreference.getPreference(PREF_KEYS.APPEARANCE_CHAIN_ANIMATION_ENABLE) as boolean)
@@ -137,9 +139,6 @@ export struct ShowDataSyncDetailsPage {
           }
         }
       }
-      .width('100%')
-      .height('100%')
-      .backgroundColor($r('app.color.window_background'))
     }
     .bindToScrollable([this.scroller])
     .titleMode(HdsNavDestinationTitleMode.MODAL)

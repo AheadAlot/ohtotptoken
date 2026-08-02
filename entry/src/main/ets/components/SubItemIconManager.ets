@@ -1,16 +1,17 @@
 import { common } from '@kit.AbilityKit';
 import { fileIo as fs } from '@kit.CoreFileKit';
-import { showSelectFilePicker } from '../utils/FileUtils';
-import { AegisIconPack, TokenIconPacks } from '../utils/TokenUtils';
+import { showSelectFilePicker } from 'common';
+import { AegisIconPack, TokenIconPacks } from 'common';
 import { BusinessError, zlib } from '@kit.BasicServicesKit';
 import { AppStorageV2 } from '@kit.ArkUI';
 import { SubItemDivider } from './SubItemDivider';
-import { AppPreference, BUILTIN_DEFAULT_PACK_ID, PREF_KEYS } from '../utils/AppPreference';
-import { AppWindowInfo } from '../entryability/EntryAbility';
-import { throttle, startBrowsableAbility } from '../utils/UiUtils';
-import { showSnackBar, SnackBarNotifyType } from '../utils/HdsSnackBarUtils';
-import { TokenStore } from '../utils/TokenStore';
+import { AppPreference, BUILTIN_DEFAULT_PACK_ID, PREF_KEYS } from 'common';
+import { AppWindowInfo } from 'common';
+import { throttle, startBrowsableAbility } from 'common';
+import { showSnackBar, SnackBarNotifyType } from 'common';
+import { TokenStore } from 'common';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { SETTING_ROW_MIN_HEIGHT, SETTING_ROW_PADDING } from './SettingStyle';
 
 interface PackItem {
   id: string;
@@ -473,6 +474,8 @@ export struct SubItemIconManager {
       }
     }
     .width('100%')
-    .padding(10)
+    .padding(SETTING_ROW_PADDING)
+    .constraintSize({ minHeight: SETTING_ROW_MIN_HEIGHT })
+    .justifyContent(FlexAlign.Center)
   }
 }

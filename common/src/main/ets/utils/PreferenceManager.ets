@@ -1,0 +1,104 @@
+import { common } from '@kit.AbilityKit';
+import { preferences } from '@kit.ArkData';
+
+const PREFERENCES_NAME: string = 'AppConfigStore';
+
+export class PreferenceManager {
+  private preferences?: preferences.Preferences;
+
+  private static instance: PreferenceManager;
+
+  private constructor() {
+  }
+
+  public static getInstance(): PreferenceManager {
+    if (!PreferenceManager.instance) {
+      PreferenceManager.instance = new PreferenceManager();
+    }
+    return PreferenceManager.instance;
+  }
+
+  async ensureInitialized(): Promise<void> {
+    if (!this.preferences) {
+      const ctx = AppStorage.get<common.UIAbilityContext>('appContext');
+      if (ctx) {
+        this.preferences = await preferences.getPreferences(ctx, PREFERENCES_NAME);
+      }
+    }
+  }
+
+  async initPreference(storeName: string): Promise<void> {
+    return preferences.getPreferences(AppStorage.get<common.UIAbilityContext>('appContext'), storeName)
+      .then((preferences: preferences.Preferences) => {
+        this.preferences = preferences;
+      });
+  }
+
+  async setValue<T>(key: string, value: T): Promise<void> {
+    if (this.preferences) {
+      await this.preferences.put(key, JSON.stringify(value));
+      this.saveUserData();
+    } else {
+      await this.initPreference(PREFERENCES_NAME);
+      await this.setValue<T>(key, value);
+    }
+  }
+
+  async getValue<T>(key: string): Promise<T | null> {
+    if (this.preferences) {
+      return this.preferences.get(key, '').then((res: preferences.ValueType) => {
+        let value: T | null = null;
+        if (res) {
+          value = JSON.parse(res as string) as T;
+        }
+        return value;
+      });
+    } else {
+      return this.initPreference(PREFERENCES_NAME).then(() => {
+        return this.getValue<T>(key);
+      });
+    }
+  }
+
+  getValueSync<T>(key: string): T | null {
+    if (!this.preferences) {
+      return null;
+    }
+    const res: preferences.ValueType = this.preferences.getSync(key, '');
+    if (res === '' || res === null || res === undefined) {
+      return null;
+    }
+    return JSON.parse(res as string) as T;
+  }
+
+  getAllValues(): Record<string, preferences.ValueType> {
+    if (!this.preferences) {
+      return {} as Record<string, preferences.ValueType>;
+    }
+    return this.preferences.getAllSync() as Record<string, preferences.ValueType>;
+  }
+
+  async hasValue(key: string): Promise<boolean> {
+    if (this.preferences) {
+      return this.preferences.has(key);
+    } else {
+      return this.initPreference(PREFERENCES_NAME).then(() => {
+        return this.hasValue(key);
+      });
+    }
+  }
+
+  async deleteValue(key: string): Promise<void> {
+    if (this.preferences) {
+      await this.preferences.delete(key);
+      this.saveUserData();
+    } else {
+      await this.initPreference(PREFERENCES_NAME);
+      await this.deleteValue(key);
+    }
+  }
+
+  saveUserData() {
+    this.preferences?.flush();
+  }
+}

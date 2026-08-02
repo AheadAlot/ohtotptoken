@@ -1,6 +1,6 @@
 import { unifiedDataChannel, uniformTypeDescriptor } from '@kit.ArkData';
 import { common } from '@kit.AbilityKit';
-import { EVENT_NAMES } from '../utils/AppPreference';
+import { EVENT_NAMES } from 'common';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 
 //文件拖拽

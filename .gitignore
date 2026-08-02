@@ -27,3 +27,8 @@ AGENTS.md
 /.agent-wiki.yaml
 /.agent-wiki/
 /.lint-cache.json
+# 各模块 oh_modules(file: 依赖展开的副本)
+**/oh_modules
+
+# Hermes Agent 会话产物
+.hermes/

@@ -2,8 +2,8 @@ import { formBindingData, FormExtensionAbility, formInfo, formProvider } from '@
 import { Want } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { TokenCardStore, CardConfig } from '../utils/TokenCardStore';
-import { KvManager } from '../utils/KvManager';
+import { TokenCardStore, CardConfig } from 'common';
+import { KvManager } from 'common';
 
 const TAG = 'EntryFormAbility';
 const DOMAIN = 0xFF00;

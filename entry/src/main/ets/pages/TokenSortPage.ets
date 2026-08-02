@@ -1,12 +1,13 @@
 import { TokenItem } from "../components/TokenItem";
-import { AppPreference, TokenPreference, EVENT_NAMES } from "../utils/AppPreference";
-import { TokenConfig } from "../utils/TokenConfig";
-import { TokenStore } from "../utils/TokenStore";
-import { GenericDataSource } from "../utils/GenericDataSource";
-import { AppWindowInfo } from "../entryability/EntryAbility";
+import { AppPreference, TokenPreference, EVENT_NAMES } from 'common';
+import { TokenConfig } from 'common';
+import { TokenStore } from 'common';
+import { GenericDataSource } from 'common';
+import { AppWindowInfo } from 'common';
+import { PageScaffold } from "../components/PageScaffold";
 import { AppStorageV2 } from "@kit.ArkUI";
 import { common } from "@kit.AbilityKit";
-import { CommonConstants } from "../utils/CommonConstants";
+import { CommonConstants } from 'common';
 import { hilog } from "@kit.PerformanceAnalysisKit";
 import {
   HdsNavDestination,
@@ -49,7 +50,7 @@ export struct TokenSortPage {
 
   build() {
     HdsNavDestination() {
-      Column() {
+      PageScaffold() {
         List({ space: this.token_preference.app_appearance_item_space, scroller: this.sortListScroller }) {
           LazyForEach(this.dataSource, (token: TokenConfig, index: number) => {
             ListItem() {
@@ -86,9 +87,6 @@ export struct TokenSortPage {
         .contentStartOffset(this.window.AvoidTopHeight + CommonConstants.AVOID_TOP_BASE_HEIGHT)
         .contentEndOffset(this.window.AvoidBottomHeight)
       }
-      .backgroundColor($r('app.color.window_background'))
-      .width('100%')
-      .height('100%')
     }
     .titleMode(HdsNavDestinationTitleMode.MINI)
     .titleBar({

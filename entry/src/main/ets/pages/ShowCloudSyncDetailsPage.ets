@@ -1,36 +1,23 @@
-/*
- * Copyright (c) 2023-2024 ohtotptoken Project Contributors
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 import { common, Want } from '@kit.AbilityKit';
 import { AppStorageV2, promptAction, LengthMetrics } from '@kit.ArkUI';
 import { SettingItem } from '../components/SettingItem';
-import { AppPreference, SettingValue, PREF_KEYS, ROUTE_NAMES } from '../utils/AppPreference';
+import { AppPreference, SettingValue, PREF_KEYS, ROUTE_NAMES } from 'common';
 import { SubItemButton } from '../components/SubItemButton';
 import { SubItemDivider } from '../components/SubItemDivider';
-import { AppWindowInfo } from '../entryability/EntryAbility';
-import { showSnackBar, SnackBarNotifyType } from '../utils/HdsSnackBarUtils';
-import { CloudBackupManager } from '../utils/CloudBackupManager';
-import { HuaweiAccountManager } from '../utils/HuaweiAccountManager';
+import { AppWindowInfo } from 'common';
+import { PageScaffold } from '../components/PageScaffold';
+import { showSnackBar, SnackBarNotifyType } from 'common';
+import { CloudBackupManager } from 'common';
+import { HuaweiAccountManager } from 'common';
 import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit';
-import { CommonConstants } from '../utils/CommonConstants';
+import { CommonConstants } from 'common';
 import { cloudSync } from '@kit.CoreFileKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { taskpool } from '@kit.ArkTS';
-import { checkCloudBackupRecords } from '../utils/CloudSyncTask';
-import { SyncTimeHelper } from '../utils/SyncTimeHelper';
-import { IconPackCloudBackup, IconPackSyncState } from '../utils/IconPackCloudBackup';
+import { checkCloudBackupRecords } from 'common';
+import { SyncTimeHelper } from 'common';
+import { IconPackCloudBackup, IconPackSyncState } from 'common';
 
 const TAG = 'ShowCloudSyncDetailsPage';
 const DOMAIN = 0xFF00;
@@ -174,7 +161,7 @@ export struct ShowCloudSyncDetailsPage {
 
   build() {
     HdsNavDestination() {
-      Column() {
+      PageScaffold() {
         RelativeContainer() {
           Stack() {
             if (this.Is_loaded) {
@@ -478,9 +465,6 @@ export struct ShowCloudSyncDetailsPage {
           }
         }
       }
-      .width('100%')
-      .height('100%')
-      .backgroundColor($r('app.color.window_background'))
     }
     .bindToScrollable([this.scroller])
     .titleMode(HdsNavDestinationTitleMode.MODAL)

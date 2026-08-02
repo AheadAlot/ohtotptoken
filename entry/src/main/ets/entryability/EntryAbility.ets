@@ -8,27 +8,16 @@ import {
 import { hilog, hiTraceMeter } from '@kit.PerformanceAnalysisKit';
 import { AppStorageV2, window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { AppPreference, SettingColorMode, PREF_KEYS, EVENT_NAMES } from '../utils/AppPreference';
+import { AppPreference, SettingColorMode, PREF_KEYS, EVENT_NAMES, AppWindowInfo } from 'common';
 import { relationalStore  } from '@kit.ArkData';
-import { DeviceInfoHelper } from '../utils/DeviceInfoHelper';
-import { DlpAntiPeepManager } from '../utils/DlpAntiPeepManager';
+import { DeviceInfoHelper } from 'common';
+import { MaterialPolicy } from '../utils/MaterialPolicy';
+import { DlpAntiPeepManager } from 'common';
+import { registerHdsSnackBar } from '../utils/HdsSnackBarUtils';
 import { formInfo } from '@kit.FormKit';
 
 //单版本分布式键值数据库
 let rdbStore: relationalStore.RdbStore | null = null;
-
-@ObservedV2
-export class AppWindowInfo {
-  @Trace AvoidTopHeight: number = 0;
-  @Trace AvoidBottomHeight: number = 0;
-  @Trace WidthBreakpoint: WidthBreakpoint = 0;
-  @Trace HeightBreakpoint: HeightBreakpoint = 0;
-  @Trace Size: window.Size = { width: 0, height: 0};
-  @Trace ColorMode: ConfigurationConstant.ColorMode = -1;
-  @Trace Context?: common.UIAbilityContext;
-  @Trace uiContext?: UIContext;
-  @Trace WindowClass?: window.Window;
-}
 
 export default class EntryAbility extends UIAbility {
   private uiContext?: UIContext;
@@ -89,6 +78,7 @@ export default class EntryAbility extends UIAbility {
 
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     AppStorage.setOrCreate("appContext", this.context);
+    registerHdsSnackBar();
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onCreate');
 
     if ((want.parameters!['action'] as string) == 'quick_scan') {
@@ -99,6 +89,8 @@ export default class EntryAbility extends UIAbility {
 
     // 初始化设备信息（根据华为文档，建议只调用一次）
     DeviceInfoHelper.getInstance().init();
+    // 初始化材质策略（API 26 沉浸光感能力检测与回退档位判定）
+    MaterialPolicy.getInstance().init();
 
     //监听前后台变化
     let applicationStateChangeCallback: ApplicationStateChangeCallback = {

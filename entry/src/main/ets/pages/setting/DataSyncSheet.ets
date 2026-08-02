@@ -1,15 +1,16 @@
 import { SubItemToggle } from '../../components/SubItemToggle'
 import { AppStorageV2 } from '@kit.ArkUI';
-import { AppPreference, SettingValue, EVENT_NAMES, PREF_KEYS, ROUTE_NAMES } from '../../utils/AppPreference';
+import { AppPreference, SettingValue, EVENT_NAMES, PREF_KEYS, ROUTE_NAMES } from 'common';
 import { SubItemButton } from '../../components/SubItemButton';
 import { SettingItem } from '../../components/SettingItem';
 import { SubItemDivider } from '../../components/SubItemDivider';
-import { AppWindowInfo } from '../../entryability/EntryAbility';
+import { AppWindowInfo } from 'common';
 import { common } from '@kit.AbilityKit';
-import { PermissionManager } from '../../utils/PermissionManager';
-import { throttle } from '../../utils/UiUtils';
+import { PermissionManager } from 'common';
+import { throttle } from 'common';
 import { ShowDataSyncDetailsPage } from '../ShowDataSyncDetailsPage';
 import { hdsMaterial, HdsNavigation, HdsNavigationTitleMode, ScrollEffectType } from '@kit.UIDesignKit';
+import { SETTING_PAGE_INSET } from '../../components/SettingStyle';
 
 @Preview
 @ComponentV2
@@ -76,7 +77,7 @@ export struct DataSyncSheet {
                   }, 1000))
               }
             }
-            .padding({ left: 10, right: 10 })
+            .padding({ left: SETTING_PAGE_INSET, right: SETTING_PAGE_INSET })
           }
           .clip(false)
           .width('100%')
