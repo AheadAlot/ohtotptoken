@@ -247,11 +247,11 @@ export struct SelectIconDialog {
       .scrollable(ScrollDirection.Horizontal)
       .scrollBar(BarState.Off)
       .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+      .clip(false)
       .layoutWeight(1)
     }
     .width('100%')
-    .height(LengthMetrics.vp(54).value)
-    .padding({ top: LengthMetrics.vp(7).value, bottom: LengthMetrics.vp(7).value, left: LengthMetrics.vp(8).value, right: LengthMetrics.vp(8).value })
+    .padding({ top: LengthMetrics.vp(12).value, bottom: LengthMetrics.vp(12).value, left: LengthMetrics.vp(8).value, right: LengthMetrics.vp(8).value })
     .alignItems(VerticalAlign.Center)
   }
 
@@ -273,11 +273,11 @@ export struct SelectIconDialog {
       .scrollable(ScrollDirection.Horizontal)
       .scrollBar(BarState.Off)
       .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+      .clip(false)
       .layoutWeight(1)
     }
     .width('100%')
-    .height(LengthMetrics.vp(54).value)
-    .padding({ top: LengthMetrics.vp(7).value, bottom: LengthMetrics.vp(7).value, left: LengthMetrics.vp(8).value, right: LengthMetrics.vp(8).value })
+    .padding({ top: LengthMetrics.vp(12).value, bottom: LengthMetrics.vp(12).value, left: LengthMetrics.vp(8).value, right: LengthMetrics.vp(8).value })
     .alignItems(VerticalAlign.Center)
   }
 

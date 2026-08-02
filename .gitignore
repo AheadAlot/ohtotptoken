@@ -27,8 +27,15 @@ AGENTS.md
 /.agent-wiki.yaml
 /.agent-wiki/
 /.lint-cache.json
+kilo.json
+CALL_CHAIN_ANALYSIS.md
+hvigorw
+
 # 各模块 oh_modules(file: 依赖展开的副本)
 **/oh_modules
 
 # Hermes Agent 会话产物
 .hermes/
+
+# OpenSpec 本地配置
+openspec/
